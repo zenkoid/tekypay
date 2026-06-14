@@ -471,8 +471,7 @@
 // ── CREDENCIALES SUPABASE ──────────────────────────────────
 const SUPABASE_URL = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
-const { createClient } = window.supabase;
-const dbClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── VALIDACIONES ───────────────────────────────────────────
 function mostrarError(id, msg) {
