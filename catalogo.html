@@ -116,6 +116,13 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:#eef1f7;color:va
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="Buscar producto o marca…">
     </div>
+    <select class="ctrl-select" id="nivelFilter">
+      <option value="">Todos los niveles</option>
+      <option value="START">⚪ TEKY START — hasta $7,500</option>
+      <option value="FLEX">🔵 TEKY FLEX — hasta $12,000</option>
+      <option value="PLUS">🟢 TEKY PLUS — hasta $25,000</option>
+      <option value="MAX">🟡 TEKY MAX — sin límite</option>
+    </select>
     <select class="ctrl-select" id="brandFilter">
       <option value="">Todas las marcas</option>
     </select>
@@ -131,6 +138,21 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:#eef1f7;color:va
     </div>
   </div>
 </header>
+
+<!-- BANNER SCORING -->
+<div id="scoringBanner" style="display:none;background:linear-gradient(135deg,#0047BA,#0060E6);margin:0;padding:14px 20px;display:none">
+  <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="color:rgba(255,255,255,.7);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Tu calificación TekyPay</div>
+      <div style="color:#fff;font-size:15px;font-weight:800" id="bannerNivel"></div>
+      <div style="color:rgba(255,255,255,.75);font-size:12px;margin-top:2px" id="bannerLinea"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div id="bannerChip" style="font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;border:2px solid rgba(255,255,255,.4);color:#fff"></div>
+      <a href="scoring.html" style="font-size:11px;color:rgba(255,255,255,.6);text-decoration:none;padding:5px 10px;border:1px solid rgba(255,255,255,.3);border-radius:8px">Recalificar</a>
+    </div>
+  </div>
+</div>
 
 <main>
   <div class="catalog-grid" id="productGrid"></div>
@@ -314,6 +336,49 @@ brands.forEach(function(b) { var o = document.createElement('option'); o.value =
 document.getElementById('searchInput').addEventListener('input', filterProducts);
 document.getElementById('brandFilter').addEventListener('change', filterProducts);
 document.getElementById('sortFilter').addEventListener('change', filterProducts);
+document.getElementById('nivelFilter').addEventListener('change', filterProducts);
+
+// ── NIVEL RANGES ──────────────────────────────────────────
+var NIVEL_RANGES = {
+  'START': { min: 0,     max: 7500  },
+  'FLEX':  { min: 0,     max: 12000 },
+  'PLUS':  { min: 0,     max: 25000 },
+  'MAX':   { min: 0,     max: 999999 },
+};
+
+// ── LEER PARAMS DE URL (viene del scoring) ────────────────
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var nivel  = params.get('nivel');
+  var linea  = params.get('linea');
+  if (!nivel) return;
+
+  // Preseleccionar filtro
+  var nf = document.getElementById('nivelFilter');
+  if (nf) {
+    for (var i=0; i<nf.options.length; i++) {
+      if (nf.options[i].value === nivel) { nf.selectedIndex = i; break; }
+    }
+  }
+
+  // Mostrar banner
+  var banner = document.getElementById('scoringBanner');
+  if (banner) {
+    banner.style.display = 'block';
+    var nombres = {START:'TEKY START',FLEX:'TEKY FLEX',PLUS:'TEKY PLUS',MAX:'TEKY MAX'};
+    var colores  = {START:'#546E7A',FLEX:'#1565C0',PLUS:'#00796B',MAX:'#F57C00'};
+    document.getElementById('bannerNivel').textContent = '¡Hola! Tu nivel es ' + (nombres[nivel]||nivel);
+    document.getElementById('bannerLinea').textContent = linea
+      ? 'Línea de crédito aprobada: $' + parseInt(linea).toLocaleString('es-MX') + ' MXN'
+      : 'Catálogo filtrado según tu calificación';
+    var chip = document.getElementById('bannerChip');
+    chip.textContent = nombres[nivel]||nivel;
+    chip.style.background = colores[nivel]||'#0047BA';
+    chip.style.borderColor = colores[nivel]||'#0047BA';
+  }
+
+  filterProducts();
+})();
 
 // API call
 function callClaude(system, user) {
@@ -558,12 +623,17 @@ function addChip(wrap, marca, color) {
 // Filter & render
 function filterProducts() {
   var search = document.getElementById('searchInput').value.toLowerCase().trim();
-  var brand = document.getElementById('brandFilter').value;
-  var sort = document.getElementById('sortFilter').value;
+  var brand  = document.getElementById('brandFilter').value;
+  var sort   = document.getElementById('sortFilter').value;
+  var nivel  = document.getElementById('nivelFilter') ? document.getElementById('nivelFilter').value : '';
   var filtered = PRODUCTS.filter(function(p) {
     var ms = !search || p.modelo.toLowerCase().indexOf(search) > -1 || p.marca.toLowerCase().indexOf(search) > -1;
     var mb = !brand || p.marca === brand;
-    return ms && mb;
+    var mn = true;
+    if (nivel && NIVEL_RANGES[nivel]) {
+      mn = p.precio_contado >= NIVEL_RANGES[nivel].min && p.precio_contado <= NIVEL_RANGES[nivel].max;
+    }
+    return ms && mb && mn;
   });
   if (sort === 'price_asc') filtered.sort(function(a,b) { return a.precio_contado - b.precio_contado; });
   else if (sort === 'price_desc') filtered.sort(function(a,b) { return b.precio_contado - a.precio_contado; });
