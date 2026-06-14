@@ -24,27 +24,29 @@
 
   /* HEADER */
   .header {
-    background: var(--teky-blue);
-    padding: 20px 24px;
+    background: #ffffff;
+    padding: 16px 24px 12px;
     text-align: center;
+    border-bottom: 3px solid var(--teky-green);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-  .header-logo {
-    font-size: 28px;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -1px;
+  .header-logo img {
+    height: 52px;
+    width: auto;
+    display: block;
+    margin: 0 auto 4px;
   }
-  .header-logo span { color: var(--teky-green); }
   .header-sub {
-    color: rgba(255,255,255,0.75);
+    color: var(--teky-gray-text, #6B7A99);
     font-size: 13px;
     margin-top: 4px;
+    font-weight: 500;
   }
 
   /* PROGRESS */
   .progress-bar {
     background: var(--teky-blue);
-    padding: 0 24px 16px;
+    padding: 8px 24px 16px;
     display: flex;
     gap: 8px;
     justify-content: center;
@@ -287,7 +289,9 @@
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-logo">TEKY<span>Pay</span></div>
+  <div class="header-logo">
+    <img src="img/TekyPayLogo.jpeg" alt="TekyPay — Programa de Beneficio Corporativo">
+  </div>
   <div class="header-sub">Programa de Beneficio Corporativo</div>
 </div>
 
@@ -432,7 +436,7 @@
   </div>
 
   <!-- TRUST -->
-  <div style="text-align:center;padding:8px;font-size:11px;color:#B0BEC5;">registro-empresa.html v1.4 — TekyPay 2026</div>
+  <div style="text-align:center;padding:8px;font-size:11px;color:#B0BEC5;">registro-empresa.html v1.6 — TekyPay 2026</div>
 <div class="trust-row">
     <div class="trust-item"><span>🔒</span> Datos cifrados</div>
     <div class="trust-item"><span>✅</span> LFPDPPP</div>
@@ -471,7 +475,8 @@
 // ── CREDENCIALES SUPABASE ──────────────────────────────────
 const SUPABASE_URL = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
-const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const { createClient } = window.supabase;
+const dbClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── VALIDACIONES ───────────────────────────────────────────
 function mostrarError(id, msg) {
@@ -488,7 +493,7 @@ function limpiarError(id) {
 }
 
 function validarRFC(rfc) {
-  return /^[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}$/i.test(rfc.trim());
+  return /^[A-ZÑ&]{3,4}(0[0-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[A-Z0-9]{3}$/i.test(rfc.trim());
 }
 function validarEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
