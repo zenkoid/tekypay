@@ -235,14 +235,14 @@
 
     <div class="field">
       <label>Ingreso mensual neto <span class="req">*</span></label>
-      <input type="number" id="ingreso" placeholder="$ Tu salario neto mensual" min="1000">
+      <input type="text" id="ingreso" placeholder="$ 0" inputmode="numeric" maxlength="10" style="max-width:200px">
       <div class="field-error" id="err_ingreso">Ingresa un monto válido</div>
       <div class="field-hint">Lo que recibes en tu cuenta después de descuentos de ley</div>
     </div>
 
     <div class="field">
       <label>Gastos mensuales fijos</label>
-      <input type="number" id="gastos" placeholder="$ Renta, servicios, créditos activos" min="0">
+      <input type="text" id="gastos" placeholder="$ 0" inputmode="numeric" maxlength="10" style="max-width:200px">
       <div class="field-hint">Opcional — mejora la precisión de tu calificación</div>
     </div>
 
@@ -312,7 +312,7 @@
     <div class="trust-item">⚡ 2 minutos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.0 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.1 — TekyPay 2026</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -384,12 +384,36 @@
     <div class="trust-item">🔒 Datos protegidos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.0 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.1 — TekyPay 2026</div>
 </div>
 
 <!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
+// ── MÁSCARA DE CANTIDAD ────────────────────────────────────
+function maskCurrency(input) {
+  input.addEventListener('input', function() {
+    let raw = this.value.replace(/[^0-9]/g, '');
+    if (!raw) { this.value = ''; return; }
+    let num = parseInt(raw, 10);
+    this.value = '$' + num.toLocaleString('es-MX');
+    this.dataset.raw = raw;
+  });
+  input.addEventListener('focus', function() {
+    if (this.value) {
+      let raw = this.value.replace(/[^0-9]/g, '');
+      this.value = raw ? '$' + parseInt(raw).toLocaleString('es-MX') : '';
+    }
+  });
+}
+
+function getRawValue(id) {
+  const el = document.getElementById(id);
+  const raw = el.dataset.raw || el.value.replace(/[^0-9]/g, '');
+  return parseFloat(raw) || 0;
+}
+
 // ── CREDENCIALES ───────────────────────────────────────────
 const SUPABASE_URL = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
@@ -437,6 +461,8 @@ async function cargarEmpresas() {
 // Bono automático por empleados al seleccionar empresa
 document.addEventListener('DOMContentLoaded', () => {
   cargarEmpresas();
+  maskCurrency(document.getElementById('ingreso'));
+  maskCurrency(document.getElementById('gastos'));
 
   document.getElementById('empresa_id').addEventListener('change', function() {
     const opt = this.options[this.selectedIndex];
@@ -454,8 +480,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function actualizarCapacity() {
-  const ingreso = parseFloat(document.getElementById('ingreso').value) || 0;
-  const gastos  = parseFloat(document.getElementById('gastos').value)  || 0;
+  const ingreso = getRawValue('ingreso');
+  const gastos  = getRawValue('gastos');
   if (ingreso <= 0) { document.getElementById('capacityBox').style.display='none'; return; }
 
   const disponible = ingreso - gastos;
@@ -532,14 +558,14 @@ function validar() {
   const edad   = parseInt(document.getElementById('edad').value);
   const antig  = document.getElementById('antiguedad').value;
   const emp    = document.getElementById('empresa_id').value;
-  const ingreso= parseFloat(document.getElementById('ingreso').value);
+  const ingreso= getRawValue('ingreso');
   const privac = document.getElementById('acepta_privacidad').checked;
 
   if (!nombre) { show('err_nombre'); document.getElementById('nombre').classList.add('error'); ok=false; }
   if (isNaN(edad)||edad<18||edad>70) { show('err_edad'); document.getElementById('edad').classList.add('error'); ok=false; }
   if (!antig) { show('err_antiguedad'); document.getElementById('antiguedad').classList.add('error'); ok=false; }
   if (!emp) { show('err_empresa_id'); document.getElementById('empresa_id').classList.add('error'); ok=false; }
-  if (!ingreso||ingreso<1000) { show('err_ingreso'); document.getElementById('ingreso').classList.add('error'); ok=false; }
+  if (!ingreso||ingreso<1000) { show('err_ingreso','Mínimo $1,000'); document.getElementById('ingreso').classList.add('error'); ok=false; }
   if (!privac) { show('err_privacidad'); ok=false; }
 
   return ok;
@@ -559,8 +585,8 @@ async function calcularScore() {
     edad:           parseInt(document.getElementById('edad').value),
     antiguedad:     document.getElementById('antiguedad').value,
     empresa_id:     document.getElementById('empresa_id').value,
-    ingreso:        parseFloat(document.getElementById('ingreso').value),
-    gastos:         parseFloat(document.getElementById('gastos').value)||0,
+    ingreso:        getRawValue('ingreso'),
+    gastos:         getRawValue('gastos'),
     bono_buro:      document.getElementById('bono_buro').checked,
     bono_empleados: document.getElementById('bono_empleados').checked,
   };
@@ -663,7 +689,11 @@ function mostrarResultado(score, nivel, linea, datos, pagoMax) {
 }
 
 function irCatalogo() {
-  window.location.href = 'catalogo.html';
+  // Recuperar nivel y línea del último resultado mostrado
+  const nivelName = document.getElementById('nivelName').textContent;
+  const nivelId   = nivelName.replace('TEKY ','');
+  const lineaText = document.getElementById('nivelLinea').textContent.replace(/[$,]/g,'').trim();
+  window.location.href = 'catalogo.html?nivel=' + nivelId + '&linea=' + lineaText;
 }
 
 function reiniciar() {
