@@ -312,7 +312,7 @@
     <div class="trust-item">⚡ 2 minutos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.2 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.3 — TekyPay 2026</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -384,7 +384,7 @@
     <div class="trust-item">🔒 Datos protegidos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.2 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.3 — TekyPay 2026</div>
 </div>
 
 <!-- SUPABASE -->
@@ -694,11 +694,11 @@ function mostrarResultado(score, nivel, linea, datos, pagoMax) {
 }
 
 function irCatalogo() {
-  // Recuperar nivel y línea del último resultado mostrado
-  const nivelName = document.getElementById('nivelName').textContent;
-  const nivelId   = nivelName.replace('TEKY ','');
-  const lineaText = document.getElementById('nivelLinea').textContent.replace(/[$,]/g,'').trim();
-  window.location.href = 'catalogo.html?nivel=' + nivelId + '&linea=' + lineaText;
+  const nivelName  = document.getElementById('nivelName').textContent;
+  const nivelId    = nivelName.replace('TEKY ','').trim();
+  const lineaText  = document.getElementById('nivelLinea').textContent.replace(/[$,]/g,'').trim();
+  const ingresoVal = getRawValue('ingreso');
+  window.location.href = 'catalogo.html?nivel=' + nivelId + '&linea=' + lineaText + '&ingreso=' + Math.round(ingresoVal);
 }
 
 function reiniciar() {
