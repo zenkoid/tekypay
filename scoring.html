@@ -312,7 +312,7 @@
     <div class="trust-item">⚡ 2 minutos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.1 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.2 — TekyPay 2026</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -384,7 +384,7 @@
     <div class="trust-item">🔒 Datos protegidos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.1 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.2 — TekyPay 2026</div>
 </div>
 
 <!-- SUPABASE -->
@@ -628,6 +628,11 @@ async function calcularScore() {
 }
 
 function mostrarResultado(score, nivel, linea, datos, pagoMax) {
+  // Guardar para URL del catálogo
+  _lastIngreso = datos.ingreso;
+  _lastNivel   = nivel.id;
+  _lastLinea   = linea;
+
   // Ocultar form, mostrar resultado
   document.getElementById('formSection').style.display = 'none';
   document.getElementById('resultScreen').style.display = 'block';
