@@ -233,7 +233,7 @@
     <div class="trust-item">✅ LFPDPPP</div>
     <div class="trust-item">📄 Documento legal</div>
   </div>
-  <div class="version-tag">simulador.html v1.1 — TekyPay 2026</div>
+  <div class="version-tag">simulador.html v1.2 — TekyPay 2026</div>
 </div>
 
 <!-- ═══════════════════════════════
@@ -251,7 +251,7 @@
     <button class="btn-primary" onclick="window.location.href='catalogo.html'">Ver más productos</button>
     <button class="btn-secondary" onclick="window.location.href='scoring.html'">Nueva calificación</button>
   </div>
-  <div class="version-tag">simulador.html v1.1 — TekyPay 2026</div>
+  <div class="version-tag">simulador.html v1.2 — TekyPay 2026</div>
 </div>
 
 <!-- SUPABASE -->
@@ -269,6 +269,7 @@ const PRECIO   = parseFloat(params.get('precio')) || 0;
 const MARCA    = decodeURIComponent(params.get('marca') || '');
 const NIVEL    = params.get('nivel') || '';
 const LINEA    = parseFloat(params.get('linea')) || 0;
+const INGRESO  = parseFloat(params.get('ingreso')) || 0;
 
 // ── ESTADO ─────────────────────────────────────────────────
 let enganche  = 0.20;
@@ -345,34 +346,50 @@ function calcular() {
   document.getElementById('pagoMonto').textContent   = mxn(pagoTotal);
   document.getElementById('pagoPeriodo').textContent = 'por pago ' + cfg.labelPlural.replace('es','');
 
-  // Capacidad (si viene del scoring)
-  const capEl    = document.getElementById('pagoCapacidad');
-  const alerta   = document.getElementById('alerta30');
-  const btn      = document.getElementById('btnSolicitar');
+  // Capacidad de pago
+  const capEl  = document.getElementById('pagoCapacidad');
+  const alerta = document.getElementById('alerta30');
+  const btn    = document.getElementById('btnSolicitar');
   const pagoMens = periodo === 'mensual' ? pagoTotal : periodo === 'quincenal' ? pagoTotal * 2 : pagoTotal * 4;
 
-  if (LINEA > 0) {
-    const ingresoEst = LINEA / 18 / 0.30; // estimado inverso
-    const pct = Math.round((pagoMens / ingresoEst) * 100);
+  if (INGRESO > 0) {
+    // Usamos ingreso real del scoring
+    const pct = Math.round((pagoMens / INGRESO) * 100);
     if (pct > 30) {
-      capEl.className  = 'pago-capacidad error';
-      capEl.textContent = '⚠️ Supera el 30% de tu capacidad';
+      capEl.className   = 'pago-capacidad error';
+      capEl.textContent = '⚠️ Supera el 30% de tu capacidad (' + pct + '%)';
       alerta.style.display = 'block';
       btn.disabled = true;
     } else if (pct > 22) {
-      capEl.className  = 'pago-capacidad warn';
+      capEl.className   = 'pago-capacidad warn';
       capEl.textContent = '⚡ ' + pct + '% de tu ingreso — límite cercano';
       alerta.style.display = 'none';
       btn.disabled = false;
     } else {
-      capEl.className  = 'pago-capacidad ok';
+      capEl.className   = 'pago-capacidad ok';
       capEl.textContent = '✅ ' + pct + '% de tu ingreso — dentro del límite';
+      alerta.style.display = 'none';
+      btn.disabled = false;
+    }
+  } else if (LINEA > 0) {
+    // Fallback: estimado por línea de crédito
+    const ingresoEst = LINEA / 18 / 0.30;
+    const pct = Math.round((pagoMens / ingresoEst) * 100);
+    if (pct > 30) {
+      capEl.className   = 'pago-capacidad error';
+      capEl.textContent = '⚠️ Supera el 30% de tu capacidad';
+      alerta.style.display = 'block';
+      btn.disabled = true;
+    } else {
+      capEl.className   = 'pago-capacidad ok';
+      capEl.textContent = '✅ Pago dentro del rango TekyPay';
       alerta.style.display = 'none';
       btn.disabled = false;
     }
   } else {
     capEl.className   = 'pago-capacidad ok';
     capEl.textContent = '✅ Pago dentro del rango TekyPay';
+    alerta.style.display = 'none';
     btn.disabled = false;
   }
 
