@@ -568,7 +568,7 @@ async function enviarFormulario() {
     const { data, error } = await dbClient
       .from('empresas')
       .insert([datos])
-      .select();
+    
 
     if (error) throw error;
 
