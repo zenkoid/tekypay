@@ -499,7 +499,7 @@ function openSpecs(marca, modelo, color) {
     html += '<div class="specs-img-wrap">';
     var specsImgUrl = LOCAL_IMAGES[marca + '|' + modelo];
     if (specsImgUrl) {
-      html += '<img src="' + specsImgUrl + '" alt="' + modelo + '" style="max-height:200px;max-width:90%;object-fit:contain;" onerror="this.parentNode.innerHTML='<div class=\'specs-no-img\' style=\'background:' + color + '\'>' + marca.substring(0,2) + '</div>'">';
+      html += '<img src="' + specsImgUrl + '" alt="' + modelo + '" style="max-height:200px;max-width:90%;object-fit:contain;" onerror="this.style.display=\'none\'">';
     } else {
       html += '<div class="specs-no-img" style="background:' + color + '">' + marca.substring(0,2) + '</div>';
     }
