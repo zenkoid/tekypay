@@ -286,6 +286,263 @@ body{font-family:var(--font-body);background:var(--white);color:var(--dark);over
 }
 .footer-mini p{font-size:11px;color:rgba(255,255,255,.4);line-height:1.7}
 .footer-mini strong{color:var(--green)}
+/* ══════════════════════════════════════════════════════════════
+   AFILIACIÓN EMPRESA (B2B) — banda + modal con formulario CRM
+   Bloque autocontenido. Prefijo .afil- / .tp- para no colisionar.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Banda invitación ── */
+.afil-band{
+  background:var(--blue-deeper);
+  padding:46px 20px;
+  position:relative;
+  overflow:hidden;
+}
+.afil-band::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:radial-gradient(circle at 15% 25%,rgba(255,255,255,.05) 1px,transparent 1px),radial-gradient(circle at 85% 75%,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:30px 30px;
+  pointer-events:none;
+}
+.afil-inner{
+  position:relative;
+  z-index:2;
+  max-width:640px;
+  margin:0 auto;
+  text-align:center;
+}
+.afil-label{
+  display:inline-block;
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  color:var(--green);
+  background:rgba(132,189,0,.12);
+  border:1px solid rgba(132,189,0,.4);
+  padding:5px 14px;
+  border-radius:100px;
+  margin-bottom:18px;
+}
+.afil-h2{
+  font-family:var(--font-display);
+  font-size:clamp(23px,6.2vw,34px);
+  font-weight:400;
+  color:var(--white);
+  line-height:1.2;
+  letter-spacing:-.3px;
+  margin-bottom:14px;
+}
+.afil-h2 em{font-style:italic;color:var(--green)}
+.afil-p{
+  font-size:14.5px;
+  color:rgba(255,255,255,.78);
+  line-height:1.68;
+  max-width:500px;
+  margin:0 auto 26px;
+}
+.afil-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  background:var(--green);
+  color:var(--white);
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:700;
+  padding:15px 30px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  transition:background .2s,transform .15s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(132,189,0,.32);
+  width:100%;
+  max-width:340px;
+}
+@media(min-width:480px){.afil-btn{width:auto}}
+.afil-btn:hover{background:var(--green-dark);transform:translateY(-2px);box-shadow:0 8px 28px rgba(132,189,0,.42)}
+.afil-btn:active{transform:translateY(0)}
+.afil-btn:focus-visible{outline:3px solid rgba(255,255,255,.6);outline-offset:3px}
+.afil-note{
+  font-size:11.5px;
+  color:rgba(255,255,255,.5);
+  margin-top:16px;
+  line-height:1.5;
+}
+
+/* ── Modal ── */
+.tp-modal{position:fixed;inset:0;z-index:9999;display:none}
+.tp-modal.is-open{display:block}
+.tp-modal-bg{
+  position:absolute;
+  inset:0;
+  background:rgba(0,18,55,.7);
+  -webkit-backdrop-filter:blur(3px);
+  backdrop-filter:blur(3px);
+  animation:tpFade .2s ease;
+}
+@keyframes tpFade{from{opacity:0}to{opacity:1}}
+.tp-modal-panel{
+  position:relative;
+  background:var(--white);
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  animation:tpUp .25s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes tpUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:768px){
+  .tp-modal-panel{
+    max-width:580px;
+    height:auto;
+    max-height:88vh;
+    margin:6vh auto;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,.35);
+  }
+}
+.tp-modal-head{
+  background:var(--blue);
+  padding:17px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-shrink:0;
+}
+.tp-modal-title{
+  font-family:var(--font-body);
+  font-size:15px;
+  font-weight:700;
+  color:var(--white);
+  line-height:1.3;
+}
+.tp-modal-title small{
+  display:block;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  color:var(--green);
+  margin-bottom:3px;
+}
+.tp-modal-close{
+  flex-shrink:0;
+  width:36px;height:36px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  color:var(--white);
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .18s;
+}
+.tp-modal-close:hover{background:rgba(255,255,255,.2)}
+.tp-modal-close:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.tp-modal-body{
+  padding:22px 20px 30px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  flex:1;
+}
+.tp-intro{
+  font-size:13.5px;
+  color:var(--gray-600);
+  line-height:1.65;
+  margin-bottom:20px;
+}
+.tp-form-host{min-height:200px}
+.tp-form-host iframe{width:100%!important;border:0}
+
+/* Estilo del formulario cuando se renderiza en línea (no iframe) */
+.tp-form-host input[type=text],
+.tp-form-host input[type=email],
+.tp-form-host input[type=tel],
+.tp-form-host input[type=number],
+.tp-form-host select{
+  width:100%;
+  font-family:var(--font-body);
+  font-size:15px;
+  color:var(--dark);
+  padding:12px 14px;
+  border:1.5px solid var(--gray-100);
+  border-radius:10px;
+  background:var(--white);
+  margin-bottom:4px;
+}
+.tp-form-host input:focus,.tp-form-host select:focus{outline:none;border-color:var(--blue)}
+.tp-form-host label{font-size:13px;font-weight:600;color:var(--dark);display:block;margin-bottom:6px}
+.tp-form-host input[type=submit]{
+  width:100%;
+  background:var(--green);
+  color:var(--white);
+  font-family:var(--font-body);
+  font-size:14.5px;
+  font-weight:700;
+  padding:14px 24px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  margin-top:10px;
+}
+.tp-form-host input[type=submit]:hover{background:var(--green-dark)}
+
+/* Estado de carga */
+.tp-loading{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  color:var(--gray-400);
+  padding:26px 0;
+}
+.tp-spin{
+  width:16px;height:16px;
+  border:2px solid var(--gray-100);
+  border-top-color:var(--blue);
+  border-radius:50%;
+  animation:tpSpin .8s linear infinite;
+}
+@keyframes tpSpin{to{transform:rotate(360deg)}}
+
+/* Ruta alterna si el formulario no carga */
+.tp-fallback{
+  display:none;
+  background:var(--gray-50);
+  border:1px solid var(--gray-100);
+  border-radius:12px;
+  padding:18px;
+  font-size:13px;
+  color:var(--gray-600);
+  line-height:1.6;
+}
+.tp-fallback.is-shown{display:block}
+.tp-fallback a{
+  display:inline-block;
+  margin-top:12px;
+  color:var(--blue);
+  font-weight:700;
+  text-decoration:none;
+  border-bottom:2px solid var(--green);
+  padding-bottom:1px;
+}
+.tp-privacy{
+  font-size:11px;
+  color:var(--gray-400);
+  line-height:1.55;
+  margin-top:20px;
+  padding-top:14px;
+  border-top:1px solid var(--gray-100);
+}
+body.tp-locked{overflow:hidden}
+
 </style>
 </head>
 <body>
@@ -472,6 +729,26 @@ body{font-family:var(--font-body);background:var(--white);color:var(--dark);over
     </a>
   </div>
 </section>
+
+
+<!-- ═══════ BLOQUE B2B — AFILIACIÓN DE EMPRESAS ═══════ -->
+<section class="afil-band" id="afiliacion-empresa">
+  <div class="afil-inner">
+    <span class="afil-label">Para empresas</span>
+    <h2 class="afil-h2">¿Tu empresa aún no ofrece <em>este beneficio</em>?</h2>
+    <p class="afil-p">
+      TekyPay se integra como una prestación adicional para tu plantilla, sin costo
+      para la empresa y sin carga administrativa. Déjanos tus datos y un ejecutivo
+      te contacta para explicarte cómo funciona el convenio.
+    </p>
+    <button type="button" class="afil-btn" id="afilOpen">
+      Formulario de Afiliación Empresa
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <p class="afil-note">Toma menos de un minuto. Sin compromiso.</p>
+  </div>
+</section>
+<!-- ═══════ FIN BLOQUE B2B ═══════ -->
 
 <footer class="footer-mini">
   <p>
@@ -1080,5 +1357,121 @@ body{font-family:var(--font-body);background:var(--white);color:var(--dark);over
   const catalog = JSON.parse(document.getElementById('tekypay-catalog-data').textContent);
   // Ejemplo de acceso: catalog[0].name, catalog[0].image, catalog[0].category
 -->
+
+<!-- ═══════ MODAL — FORMULARIO DE AFILIACIÓN (CRM) ═══════ -->
+<div class="tp-modal" id="afilModal" role="dialog" aria-modal="true" aria-labelledby="afilModalTitle" aria-hidden="true">
+  <div class="tp-modal-bg" data-afil-close></div>
+  <div class="tp-modal-panel">
+    <div class="tp-modal-head">
+      <div class="tp-modal-title" id="afilModalTitle">
+        <small>Afiliación empresarial</small>
+        Registra a tu empresa
+      </div>
+      <button type="button" class="tp-modal-close" id="afilClose" aria-label="Cerrar formulario">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="tp-modal-body">
+      <p class="tp-intro">
+        Comparte los datos de contacto de tu empresa. Un ejecutivo de TekyPay se comunicará
+        contigo para revisar el convenio y los requisitos de incorporación.
+      </p>
+
+      <div class="tp-form-host" id="afilFormHost">
+        <div class="tp-loading" id="afilLoading">
+          <span class="tp-spin" aria-hidden="true"></span>
+          Cargando formulario…
+        </div>
+        <!-- Formulario nativo del CRM -->
+        <div class="hs-form-frame" data-region="na1" data-form-id="eb38d16c-622c-422e-add4-7d7d230f2ef6" data-portal-id="51892572"></div>
+      </div>
+
+      <div class="tp-fallback" id="afilFallback">
+        El formulario no pudo cargarse en este momento. Puedes registrar a tu empresa
+        directamente desde el siguiente enlace:
+        <a href="https://uw8kc.share.hsforms.com/26zjRbGIsQi6t1H19Iw8u9g" target="_blank" rel="noopener">Abrir formulario de afiliación →</a>
+      </div>
+
+      <p class="tp-privacy">
+        Los datos que proporciones se utilizan únicamente para contactarte respecto a la
+        afiliación de tu empresa y se procesan a través de la plataforma de gestión comercial
+        de TekyPay. Consulta el Aviso de Privacidad para conocer el tratamiento de tu información.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://js.hsforms.net/forms/embed/51892572.js" defer></script>
+<script>
+(function(){
+  var modal    = document.getElementById('afilModal');
+  var openBtn  = document.getElementById('afilOpen');
+  var closeBtn = document.getElementById('afilClose');
+  var loading  = document.getElementById('afilLoading');
+  var fallback = document.getElementById('afilFallback');
+  var frame    = modal ? modal.querySelector('.hs-form-frame') : null;
+  var lastFocus = null;
+  var watchTimer = null;
+
+  if(!modal || !openBtn) return;
+
+  function formIsReady(){
+    return !!(frame && (frame.querySelector('iframe') || frame.querySelector('form')));
+  }
+
+  // Vigila la carga del formulario y ofrece ruta alterna si no aparece.
+  function watchForm(){
+    var waited = 0;
+    clearInterval(watchTimer);
+    watchTimer = setInterval(function(){
+      waited += 400;
+      if(formIsReady()){
+        loading.style.display = 'none';
+        fallback.classList.remove('is-shown');
+        clearInterval(watchTimer);
+      } else if(waited >= 6000){
+        loading.style.display = 'none';
+        fallback.classList.add('is-shown');
+        clearInterval(watchTimer);
+      }
+    }, 400);
+  }
+
+  function openModal(){
+    lastFocus = document.activeElement;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('tp-locked');
+    if(formIsReady()){ loading.style.display = 'none'; } else { watchForm(); }
+    closeBtn.focus();
+  }
+
+  function closeModal(){
+    clearInterval(watchTimer);
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('tp-locked');
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  Array.prototype.forEach.call(modal.querySelectorAll('[data-afil-close]'), function(el){
+    el.addEventListener('click', closeModal);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  // Permite abrir el formulario con la liga directa tekypay.mx/#afiliacion
+  if(window.location.hash === '#afiliacion') {
+    window.addEventListener('load', function(){ setTimeout(openModal, 300); });
+  }
+})();
+</script>
+<!-- ═══════ FIN MODAL AFILIACIÓN ═══════ -->
+
 </body>
 </html>
