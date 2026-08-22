@@ -458,41 +458,7 @@ body{font-family:var(--font-body);background:var(--white);color:var(--dark);over
   line-height:1.65;
   margin-bottom:20px;
 }
-.tp-form-host{min-height:200px}
-.tp-form-host iframe{width:100%!important;border:0}
-
-/* Estilo del formulario cuando se renderiza en línea (no iframe) */
-.tp-form-host input[type=text],
-.tp-form-host input[type=email],
-.tp-form-host input[type=tel],
-.tp-form-host input[type=number],
-.tp-form-host select{
-  width:100%;
-  font-family:var(--font-body);
-  font-size:15px;
-  color:var(--dark);
-  padding:12px 14px;
-  border:1.5px solid var(--gray-100);
-  border-radius:10px;
-  background:var(--white);
-  margin-bottom:4px;
-}
-.tp-form-host input:focus,.tp-form-host select:focus{outline:none;border-color:var(--blue)}
-.tp-form-host label{font-size:13px;font-weight:600;color:var(--dark);display:block;margin-bottom:6px}
-.tp-form-host input[type=submit]{
-  width:100%;
-  background:var(--green);
-  color:var(--white);
-  font-family:var(--font-body);
-  font-size:14.5px;
-  font-weight:700;
-  padding:14px 24px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  margin-top:10px;
-}
-.tp-form-host input[type=submit]:hover{background:var(--green-dark)}
+.tp-form-host{min-height:280px}
 
 /* Estado de carga */
 .tp-loading{
@@ -1377,13 +1343,14 @@ body.tp-locked{overflow:hidden}
         contigo para revisar el convenio y los requisitos de incorporación.
       </p>
 
+      <!-- El formulario del CRM se inyecta aquí al abrir el modal.
+           No se renderiza oculto: el script necesita que el contenedor
+           sea visible para calcular su altura correctamente. -->
       <div class="tp-form-host" id="afilFormHost">
         <div class="tp-loading" id="afilLoading">
           <span class="tp-spin" aria-hidden="true"></span>
           Cargando formulario…
         </div>
-        <!-- Formulario nativo del CRM -->
-        <div class="hs-form-frame" data-region="na1" data-form-id="eb38d16c-622c-422e-add4-7d7d230f2ef6" data-portal-id="51892572"></div>
       </div>
 
       <div class="tp-fallback" id="afilFallback">
@@ -1401,17 +1368,24 @@ body.tp-locked{overflow:hidden}
   </div>
 </div>
 
-<script src="https://js.hsforms.net/forms/embed/51892572.js" defer></script>
 <script>
 (function(){
   var modal    = document.getElementById('afilModal');
   var openBtn  = document.getElementById('afilOpen');
   var closeBtn = document.getElementById('afilClose');
+  var host     = document.getElementById('afilFormHost');
   var loading  = document.getElementById('afilLoading');
   var fallback = document.getElementById('afilFallback');
-  var frame    = modal ? modal.querySelector('.hs-form-frame') : null;
-  var lastFocus = null;
+  var lastFocus  = null;
   var watchTimer = null;
+  var injected   = false;
+  var frame      = null;
+
+  // Parametros del formulario del CRM
+  var HS_SRC    = 'https://js.hsforms.net/forms/embed/51892572.js';
+  var HS_REGION = 'na1';
+  var HS_FORM   = 'eb38d16c-622c-422e-add4-7d7d230f2ef6';
+  var HS_PORTAL = '51892572';
 
   if(!modal || !openBtn) return;
 
@@ -1419,22 +1393,49 @@ body.tp-locked{overflow:hidden}
     return !!(frame && (frame.querySelector('iframe') || frame.querySelector('form')));
   }
 
-  // Vigila la carga del formulario y ofrece ruta alterna si no aparece.
+  function showFallback(){
+    clearInterval(watchTimer);
+    if(loading) loading.style.display = 'none';
+    fallback.classList.add('is-shown');
+  }
+
+  // Vigila la carga y ofrece ruta alterna si el formulario no aparece.
   function watchForm(){
     var waited = 0;
     clearInterval(watchTimer);
     watchTimer = setInterval(function(){
       waited += 400;
       if(formIsReady()){
-        loading.style.display = 'none';
+        if(loading) loading.style.display = 'none';
         fallback.classList.remove('is-shown');
         clearInterval(watchTimer);
-      } else if(waited >= 6000){
-        loading.style.display = 'none';
-        fallback.classList.add('is-shown');
-        clearInterval(watchTimer);
+      } else if(waited >= 8000){
+        showFallback();
       }
     }, 400);
+  }
+
+  // El formulario se inyecta con el modal YA visible.
+  // Renderizarlo dentro de un contenedor oculto hace que el script del CRM
+  // calcule altura cero y el formato salga roto.
+  function injectForm(){
+    if(injected) return;
+    injected = true;
+
+    frame = document.createElement('div');
+    frame.className = 'hs-form-frame';
+    frame.setAttribute('data-region',    HS_REGION);
+    frame.setAttribute('data-form-id',   HS_FORM);
+    frame.setAttribute('data-portal-id', HS_PORTAL);
+    host.appendChild(frame);
+
+    var s = document.createElement('script');
+    s.src     = HS_SRC;
+    s.defer   = true;
+    s.onerror = showFallback;
+    document.body.appendChild(s);
+
+    watchForm();
   }
 
   function openModal(){
@@ -1442,8 +1443,11 @@ body.tp-locked{overflow:hidden}
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden','false');
     document.body.classList.add('tp-locked');
-    if(formIsReady()){ loading.style.display = 'none'; } else { watchForm(); }
     closeBtn.focus();
+    // Dos frames: el panel ya tiene dimensiones reales antes de inyectar.
+    requestAnimationFrame(function(){
+      requestAnimationFrame(injectForm);
+    });
   }
 
   function closeModal(){
