@@ -1,0 +1,22 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: '0 15 * * 1,4'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          CODE=$(curl -s -o /tmp/resp.txt -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/empresas?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "HTTP $CODE"
+          cat /tmp/resp.txt
+          if [ "$CODE" != "200" ]; then
+            echo "::error::Supabase respondió $CODE"
+            exit 1
+          fi
