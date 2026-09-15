@@ -212,8 +212,11 @@
 
   <!-- TABLA DE AMORTIZACIÓN -->
   <div class="card">
-    <div class="card-title"><div class="card-icon">📅</div>Tabla de Amortización</div>
+    <div class="card-title"><div class="card-icon">📅</div>Plan de Pagos</div>
     <div class="tabla-wrap">
+      <div style="font-size:11px;color:#6B7A99;margin:0 0 8px;line-height:1.5">
+        El enganche se cubre por separado al firmar y no forma parte de estos cobros.
+      </div>
       <table id="tablaAmort">
         <thead>
           <tr>
@@ -233,7 +236,7 @@
     <div class="trust-item">✅ LFPDPPP</div>
     <div class="trust-item">📄 Documento legal</div>
   </div>
-  <div class="version-tag">simulador.html v2.2 — TekyPay 2026</div>
+  <div class="version-tag">simulador.html v2.4 — TekyPay 2026</div>
 </div>
 
 <!-- ═══════════════════════════════
@@ -251,7 +254,7 @@
     <button class="btn-primary" onclick="window.location.href='catalogo.html'">Ver más productos</button>
     <button class="btn-secondary" onclick="window.location.href='scoring.html'">Nueva calificación</button>
   </div>
-  <div class="version-tag">simulador.html v2.2 — TekyPay 2026</div>
+  <div class="version-tag">simulador.html v2.4 — TekyPay 2026</div>
 </div>
 
 <!-- SUPABASE -->
@@ -501,8 +504,9 @@ function generarTabla(capital, cfg, pagoTotal, engancheMonto) {
   let saldo    = capital;
   let rows     = '';
 
-  // Fila 0 — Enganche
-  rows += '<tr><td>0</td><td>' + formatFecha(hoy) + '</td><td><strong>' + mxn(engancheMonto) + '</strong></td><td>' + mxn(saldo) + '</td></tr>';
+  // El enganche NO va aquí: se paga aparte y no es uno de los cobros
+  // que Quentli va a ejecutar. Si apareciera como renglón cero, la
+  // tabla mostraría un cobro más de los que realmente se cobran.
 
   for (let i = 1; i <= cfg.n; i++) {
     const fecha = new Date(hoy);
@@ -513,10 +517,9 @@ function generarTabla(capital, cfg, pagoTotal, engancheMonto) {
     rows += '<tr><td>' + i + '</td><td>' + formatFecha(fecha) + '</td><td>' + mxn(pagoTotal) + '</td><td>' + mxn(saldo) + '</td></tr>';
   }
 
-  // Totales
-  const cfg2    = getPeriodoConfig();
-  const totalPag= engancheMonto + pagoTotal * cfg.n;
-  rows += '<tr><td colspan="2">TOTAL</td><td>' + mxn(totalPag) + '</td><td>$0.00</td></tr>';
+  // Totales — solo los cobros periódicos
+  const totalCobros = pagoTotal * cfg.n;
+  rows += '<tr><td colspan="2">TOTAL DE LOS ' + cfg.n + ' COBROS</td><td>' + mxn(totalCobros) + '</td><td>$0.00</td></tr>';
   body.innerHTML = rows;
 }
 
@@ -636,9 +639,11 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal, tasaMensual) 
     .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F5F7FA;font-size:12px}
     .row .lbl{color:#6B7A99}
     .row .val{font-weight:700}
-    .highlight{background:#0047BA;color:#fff;border-radius:8px;padding:12px 16px;text-align:center;margin:14px 0}
+    .highlight{background:#EEF4FF;color:#0047BA;border:2px solid #0047BA;border-radius:8px;padding:12px 16px;text-align:center;margin:14px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .highlight .sub{color:#2B2B2B}
+    @media print{ body{-webkit-print-color-adjust:exact;print-color-adjust:exact} }
     .highlight .monto{font-size:28px;font-weight:900}
-    .highlight .sub{font-size:11px;opacity:.8;margin-top:2px}
+    .highlight .sub{font-size:11px;margin-top:2px}
     table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px}
     th{background:#0047BA;color:#fff;padding:6px 8px;text-align:left}
     .firma-section{margin-top:24px;display:flex;gap:40px}
@@ -671,12 +676,12 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal, tasaMensual) 
   <div class="row"><span class="lbl">Enganche (${Math.round(enganche*100)}%)</span><span class="val">${mxn(engancheMonto)}</span></div>
   <div class="row"><span class="lbl">Monto financiado</span><span class="val">${mxn(capital)}</span></div>
   <div class="row"><span class="lbl">Tasa mensual</span><span class="val">${(tasaMensual*100).toFixed(1)}%</span></div>
-  <div class="row"><span class="lbl">Plazo</span><span class="val">${plazoMeses} meses (${cfg.n} pagos ${cfg.label}s)</span></div>
+  <div class="row"><span class="lbl">Plazo</span><span class="val">${plazoMeses} meses (${cfg.n} pagos ${cfg.labelPlural})</span></div>
   <div class="row"><span class="lbl">Total a pagar</span><span class="val">${mxn(totalPagar)}</span></div>
 
   <div class="highlight">
     <div class="monto">${mxn(pagoTotal)}</div>
-    <div class="sub">Pago ${cfg.label} — Cobro automático vía domiciliación bancaria</div>
+    <div class="sub">Pago ${cfg.label} — Cobro automático al medio de pago registrado</div>
   </div>
 
   <h2>Pago inicial</h2>
@@ -703,14 +708,14 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal, tasaMensual) 
     TekyPay al activar el crédito. Total incluyendo el enganche: ${mxn(totalPagar)}.
   </p>
 
-  <h2>Autorización de Cobro Vía Domiciliación Bancaria</h2>
+  <h2>Reconocimiento de Adeudo y Autorización de Cobro</h2>
   <p style="line-height:1.7;font-size:12px">
-    El colaborador que suscribe la presente solicitud autoriza expresamente a <strong>TekyPay</strong>
-    a gestionar el cobro periódico de <strong>${mxn(pagoTotal)}</strong> de forma <strong>${cfg.label}</strong>
-    a través de domiciliación bancaria, en concepto de pago del crédito para
-    la adquisición del producto indicado. Esta autorización tiene vigencia durante los
-    <strong>${cfg.n} periodos de pago</strong> acordados, iniciando en la fecha de cobro
-    posterior a la firma del presente documento.
+    El colaborador que suscribe reconoce el crédito otorgado por <strong>TekyPay</strong> bajo las
+    condiciones descritas en este documento, y se obliga a cubrirlo en
+    <strong>${cfg.n} pagos ${cfg.labelPlural} de ${mxn(pagoTotal)}</strong>, además del pago inicial
+    señalado. Para ello autoriza el cobro periódico de dichos importes a través del
+    <strong>medio de pago que registre para tal efecto</strong>, durante la vigencia del crédito,
+    iniciando en la fecha de cobro posterior a la firma del presente documento.
   </p>
 
   <div class="firma-section">
