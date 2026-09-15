@@ -233,7 +233,7 @@
     <div class="trust-item">✅ LFPDPPP</div>
     <div class="trust-item">📄 Documento legal</div>
   </div>
-  <div class="version-tag">simulador.html v1.2 — TekyPay 2026</div>
+  <div class="version-tag">simulador.html v2.2 — TekyPay 2026</div>
 </div>
 
 <!-- ═══════════════════════════════
@@ -251,7 +251,7 @@
     <button class="btn-primary" onclick="window.location.href='catalogo.html'">Ver más productos</button>
     <button class="btn-secondary" onclick="window.location.href='scoring.html'">Nueva calificación</button>
   </div>
-  <div class="version-tag">simulador.html v1.2 — TekyPay 2026</div>
+  <div class="version-tag">simulador.html v2.2 — TekyPay 2026</div>
 </div>
 
 <!-- SUPABASE -->
@@ -267,9 +267,38 @@ const params   = new URLSearchParams(window.location.search);
 const PRODUCTO = decodeURIComponent(params.get('producto') || 'Producto no especificado');
 const PRECIO   = parseFloat(params.get('precio')) || 0;
 const MARCA    = decodeURIComponent(params.get('marca') || '');
-const NIVEL    = params.get('nivel') || '';
-const LINEA    = parseFloat(params.get('linea')) || 0;
-const INGRESO  = parseFloat(params.get('ingreso')) || 0;
+const CID      = params.get('cid') || '';
+
+// NIVEL / LINEA / INGRESO llegan por la URL solo para pintar la
+// pantalla mientras carga. Los valores que mandan son los que
+// devuelve la base en cargarColaborador(). Nada que venga por la
+// URL decide si un credito procede.
+let NIVEL    = params.get('nivel') || '';
+let LINEA    = parseFloat(params.get('linea')) || 0;
+let INGRESO  = parseFloat(params.get('ingreso')) || 0;
+let COLAB    = null;   // registro vigente del colaborador, leido de la base
+
+// ── AVISOS EN PANTALLA ─────────────────────────────────────
+function mostrarAviso(texto, tipo) {
+  let el = document.getElementById('avisoSim');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'avisoSim';
+    el.style.cssText = 'padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.45;margin:0 0 12px';
+    const btn = document.getElementById('btnSolicitar');
+    btn.parentNode.insertBefore(el, btn);
+  }
+  const err = (tipo !== 'info');
+  el.style.background  = err ? '#FDECEC' : '#EEF4FF';
+  el.style.border      = '1.5px solid ' + (err ? '#E5484D' : '#0047BA');
+  el.style.color       = err ? '#8E1519' : '#0B3A8C';
+  el.innerHTML = texto;
+  el.style.display = 'block';
+}
+function ocultarAviso() {
+  const el = document.getElementById('avisoSim');
+  if (el) el.style.display = 'none';
+}
 
 // ── ESTADO ─────────────────────────────────────────────────
 let enganche  = 0.20;
@@ -279,7 +308,22 @@ const TASAS = {3: 0.049, 6: 0.055, 9: 0.060};
 const COMISION = 9; // comisión semanal fija
 
 // ── INIT ───────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+// Lee el registro vigente del colaborador. Es la unica fuente
+// valida de nivel, linea disponible e ingreso.
+async function cargarColaborador() {
+  if (!CID) return null;
+  try {
+    const { data, error } = await dbClient.rpc('fn_colaborador', { p_id: CID });
+    if (error) throw error;
+    if (!data || !data.length) return null;
+    return data[0];
+  } catch (e) {
+    console.error('Error leyendo colaborador:', e);
+    return null;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   // Hero
   document.getElementById('heroMarca').textContent   = MARCA || 'TekyPay';
   document.getElementById('heroNombre').textContent  = PRODUCTO;
@@ -298,6 +342,38 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // ── IDENTIDAD ────────────────────────────────────────────
+  const btnSol = document.getElementById('btnSolicitar');
+
+  if (!CID) {
+    btnSol.disabled = true;
+    calcular();
+    mostrarAviso('<strong>Estas viendo el simulador en modo consulta.</strong><br>' +
+                 'Para solicitar este producto necesitas calificar primero.', 'info');
+    return;
+  }
+
+  btnSol.disabled = true;
+  COLAB = await cargarColaborador();
+
+  if (!COLAB) {
+    calcular();
+    mostrarAviso('<strong>No pudimos identificar tu calificacion.</strong><br>' +
+                 'Vuelve a calcular tu linea de credito e intentalo de nuevo.', 'error');
+    return;
+  }
+
+  // Los valores de la base sustituyen a los de la URL
+  NIVEL   = COLAB.nivel_teky || NIVEL;
+  LINEA   = Number(COLAB.linea_disponible) || 0;
+  INGRESO = Number(COLAB.ingreso_mensual_neto) || 0;
+
+  const names = {START:'TEKY START',FLEX:'TEKY FLEX',PLUS:'TEKY PLUS',MAX:'TEKY MAX'};
+  const pill  = document.getElementById('heroPill');
+  pill.textContent   = names[NIVEL] || NIVEL;
+  pill.style.display = 'inline-block';
+
+  btnSol.disabled = false;
   calcular();
 });
 
@@ -393,6 +469,25 @@ function calcular() {
     btn.disabled = false;
   }
 
+  // ── TOPE DE LINEA DISPONIBLE ─────────────────────────────
+  // Solo el monto financiado ocupa linea. El enganche no es deuda.
+  // Esta revision es para avisar a tiempo; la que manda es la de
+  // la base, que rechaza la solicitud aunque se manipule la URL.
+  if (COLAB) {
+    const disponible = Number(COLAB.linea_disponible) || 0;
+    if (capital > disponible + 0.5) {
+      btn.disabled = true;
+      const faltante = capital - disponible;
+      mostrarAviso(
+        '<strong>Este producto rebasa tu linea disponible.</strong><br>' +
+        'Puedes financiar hasta ' + mxn(disponible) + ' y este plan requiere ' +
+        mxn(capital) + '. Sube el enganche ' + mxn(faltante) +
+        ' o elige un producto de menor precio.', 'error');
+    } else {
+      ocultarAviso();
+    }
+  }
+
   // Tabla de amortización
   generarTabla(capital, cfg, pagoTotal, montoEnganche);
 }
@@ -440,48 +535,63 @@ async function generarSolicitud() {
   const capital       = PRECIO - montoEnganche;
   const pagoBase      = calcularPago(capital, cfg.tasa, cfg.n);
   const pagoTotal     = pagoBase + (periodo === 'semanal' ? COMISION : periodo === 'quincenal' ? COMISION * 2 : COMISION * 4);
-  const folio         = 'TP-' + Date.now().toString().slice(-8);
+  const tasaMensual   = TASAS[plazoMeses] || 0.055;
 
-  // Guardar en Supabase
-  try {
-    const { data, error } = await dbClient.from('solicitudes_credito').insert([{
-      producto:         PRODUCTO,
-      precio_contado:   PRECIO,
-      enganche_porcentaje: enganche * 100,
-      enganche_monto:   montoEnganche,
-      monto_financiado: capital,
-      tasa_mensual:     TASA_MENSUAL,
-      numero_pagos:     cfg.n,
-      periodicidad:     periodo,
-      pago_periodico:   pagoTotal,
-      estado:           'pendiente',
-    }]).select();
-
-    // Guardar amortizaciones
-    if (data && data[0]) {
-      const solicitudId = data[0].id;
-      const hoy = new Date();
-      const amorts = [];
-      for (let i = 1; i <= cfg.n; i++) {
-        const fecha = new Date(hoy);
-        fecha.setDate(hoy.getDate() + (i * cfg.dias));
-        amorts.push({
-          solicitud_id:  solicitudId,
-          numero_pago:   i,
-          fecha_cobro:   fecha.toISOString().split('T')[0],
-          monto:         pagoTotal,
-          estatus_cobro: 'pendiente',
-        });
-      }
-      await dbClient.from('amortizaciones').insert(amorts);
-    }
-  } catch(e) {
-    console.error('Error Supabase:', e);
-    // Continuamos — el PDF se genera igual
+  if (!COLAB) {
+    mostrarAviso('<strong>No pudimos identificar tu calificacion.</strong><br>' +
+                 'Vuelve a calcular tu linea de credito e intentalo de nuevo.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = 'Generar mi solicitud';
+    return;
   }
 
-  // Generar PDF
-  generarPDF(folio, montoEnganche, capital, cfg, pagoTotal);
+  // ── REGISTRAR LA SOLICITUD ───────────────────────────────
+  // La funcion valida la linea disponible dentro de la base,
+  // asigna el folio consecutivo y guarda la proyeccion de pagos.
+  // El folio existe en la base ANTES de imprimirse en el documento.
+  //
+  // Si esto falla, NO se genera el documento. Una hoja firmada con
+  // un folio que no existe es peor que no tener hoja.
+  let folio, solicitudId;
+  try {
+    const { data, error } = await dbClient.rpc('fn_crear_solicitud', {
+      p_colaborador_id:   COLAB.colaborador_id,
+      p_producto:         PRODUCTO,
+      p_precio:           PRECIO,
+      p_enganche_pct:     enganche * 100,
+      p_enganche_monto:   montoEnganche,
+      p_monto_financiado: capital,
+      p_tasa:             tasaMensual,
+      p_num_pagos:        cfg.n,
+      p_periodicidad:     periodo,
+      p_pago_periodico:   pagoTotal,
+    });
+
+    if (error) throw error;
+    if (!data || !data.length) throw new Error('La base no devolvio el folio');
+
+    folio       = data[0].folio;
+    solicitudId = data[0].solicitud_id;
+
+  } catch(e) {
+    console.error('Error registrando solicitud:', e);
+    const rebasa = (e && e.message || '').indexOf('rebasa la linea') >= 0 ||
+                   (e && e.message || '').indexOf('rebasa la l') >= 0;
+    mostrarAviso(
+      rebasa
+        ? '<strong>El monto rebasa tu linea disponible.</strong><br>' +
+          'Sube el enganche o elige un producto de menor precio.'
+        : '<strong>No pudimos registrar tu solicitud.</strong><br>' +
+          'Revisa tu conexion e intentalo de nuevo. Si el problema sigue, ' +
+          'avisa a Recursos Humanos de tu empresa.',
+      'error');
+    btn.disabled  = false;
+    btn.innerHTML = 'Generar mi solicitud';
+    return;
+  }
+
+  // Generar PDF — ya con folio real y registrado
+  generarPDF(folio, montoEnganche, capital, cfg, pagoTotal, tasaMensual);
 
   // Mostrar éxito
   document.getElementById('simSection').style.display   = 'none';
@@ -491,10 +601,12 @@ async function generarSolicitud() {
 }
 
 // ── GENERACIÓN DE PDF ──────────────────────────────────────
-function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal) {
+function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal, tasaMensual) {
   const hoy      = new Date();
   const fechaStr = hoy.toLocaleDateString('es-MX', {day:'2-digit', month:'long', year:'numeric'});
-  const totalPagar = engancheMonto + pagoTotal * cfg.n;
+  const totalPagos = pagoTotal * cfg.n;          // solo lo que cobra Quentli
+  const totalPagar = engancheMonto + totalPagos; // incluye el enganche
+  const nombreColab = (COLAB && COLAB.nombre_completo) ? COLAB.nombre_completo : '';
 
   // Construir tabla de amortización para PDF
   let tablaRows = '';
@@ -547,6 +659,8 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal) {
     </div>
   </div>
 
+  ${nombreColab ? '<h2>Datos del Colaborador</h2><div class="row"><span class="lbl">Nombre</span><span class="val">' + nombreColab + '</span></div>' : ''}
+
   <h2>Datos del Producto</h2>
   <div class="row"><span class="lbl">Producto</span><span class="val">${PRODUCTO}</span></div>
   <div class="row"><span class="lbl">Marca</span><span class="val">${MARCA}</span></div>
@@ -556,7 +670,7 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal) {
   <h2>Condiciones del Crédito</h2>
   <div class="row"><span class="lbl">Enganche (${Math.round(enganche*100)}%)</span><span class="val">${mxn(engancheMonto)}</span></div>
   <div class="row"><span class="lbl">Monto financiado</span><span class="val">${mxn(capital)}</span></div>
-  <div class="row"><span class="lbl">Tasa mensual</span><span class="val">5.5%</span></div>
+  <div class="row"><span class="lbl">Tasa mensual</span><span class="val">${(tasaMensual*100).toFixed(1)}%</span></div>
   <div class="row"><span class="lbl">Plazo</span><span class="val">${plazoMeses} meses (${cfg.n} pagos ${cfg.label}s)</span></div>
   <div class="row"><span class="lbl">Total a pagar</span><span class="val">${mxn(totalPagar)}</span></div>
 
@@ -565,22 +679,29 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal) {
     <div class="sub">Pago ${cfg.label} — Cobro automático vía domiciliación bancaria</div>
   </div>
 
-  <h2>Tabla de Amortización</h2>
+  <h2>Pago inicial</h2>
+  <div class="row"><span class="lbl">Enganche a cubrir al firmar (${fechaStr})</span><span class="val">${mxn(engancheMonto)}</span></div>
+  <div class="row"><span class="lbl">Saldo a financiar</span><span class="val">${mxn(capital)}</span></div>
+  <p style="font-size:10px;color:#6B7A99;margin:6px 0 0">
+    El enganche se cubre por separado y no forma parte de los cobros periódicos.
+  </p>
+
+  <h2>Plan de Pagos — Proyección Informativa</h2>
   <table>
     <thead><tr><th>#</th><th>Fecha de cobro</th><th>Monto</th><th>Saldo restante</th></tr></thead>
     <tbody>
-      <tr><td style="padding:5px 8px;text-align:center;font-weight:700">0</td>
-          <td style="padding:5px 8px">${fechaStr}</td>
-          <td style="padding:5px 8px;text-align:right;font-weight:700">${mxn(engancheMonto)}</td>
-          <td style="padding:5px 8px;text-align:right">${mxn(capital)}</td></tr>
       ${tablaRows}
       <tr class="total-row">
-        <td colspan="2" style="padding:6px 8px">TOTAL</td>
-        <td style="padding:6px 8px;text-align:right">${mxn(totalPagar)}</td>
+        <td colspan="2" style="padding:6px 8px">TOTAL DE LOS ${cfg.n} COBROS</td>
+        <td style="padding:6px 8px;text-align:right">${mxn(totalPagos)}</td>
         <td style="padding:6px 8px;text-align:right">$0.00</td>
       </tr>
     </tbody>
   </table>
+  <p style="font-size:10px;color:#6B7A99;margin:6px 0 0">
+    Proyección calculada al ${fechaStr}. Las fechas y montos definitivos los confirma
+    TekyPay al activar el crédito. Total incluyendo el enganche: ${mxn(totalPagar)}.
+  </p>
 
   <h2>Autorización de Cobro Vía Domiciliación Bancaria</h2>
   <p style="line-height:1.7;font-size:12px">
@@ -596,7 +717,7 @@ function generarPDF(folio, engancheMonto, capital, cfg, pagoTotal) {
     <div class="firma-box">
       <br><br>
       Firma del Colaborador<br>
-      Nombre: ___________________________
+      ${nombreColab ? '<strong>' + nombreColab + '</strong>' : 'Nombre: ___________________________'}
     </div>
     <div class="firma-box">
       <br><br>
