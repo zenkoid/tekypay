@@ -103,6 +103,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:#eef1f7;color:va
 .site-footer strong{color:var(--green)}
 @media(max-width:600px){.header-top{padding:12px 16px}.controls-bar{padding:10px 16px}.catalog-grid{padding:16px;gap:14px}.logo-img{height:40px}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -346,16 +347,78 @@ var NIVEL_RANGES = {
   'MAX':   { min: 0,     max: 999999 },
 };
 
+// ── CAPACIDAD DE COMPRA DEL COLABORADOR ───────────────────
+// El catalogo deja de filtrar solo por nivel. Ahora oculta los
+// productos que el colaborador no podria adquirir ni en el mejor
+// de los escenarios, para no ofrecerle algo que la base va a
+// rechazar despues.
+var SUPABASE_URL = 'https://fygespxcsymiccwixzdc.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
+var dbCat = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+var CAP = null;        // { lineaDisponible, ingreso }
+var OCULTOS = 0;       // productos fuera de alcance
+
+// Mismas constantes que el simulador. Si alla cambian, aqui tambien.
+var ENGANCHE_MAX = 0.30;   // el mayor enganche que el simulador ofrece
+var PLAZO_MAX    = 9;      // meses
+var TASA_PLAZO_MAX = 0.060;
+var COMISION_MENSUAL = 36; // 9 semanal x 4
+
+function pagoFrances(capital, tasa, n) {
+  if (tasa === 0) return capital / n;
+  return capital * tasa / (1 - Math.pow(1 + tasa, -n));
+}
+
+// Un producto es alcanzable si, poniendo el enganche mas alto y el
+// plazo mas largo, cabe en la linea disponible Y el pago mensual no
+// rebasa el 30% del ingreso.
+function esAlcanzable(precio) {
+  if (!CAP) return true;
+  var capitalMin = precio * (1 - ENGANCHE_MAX);
+  if (capitalMin > CAP.lineaDisponible + 0.5) return false;
+  if (CAP.ingreso > 0) {
+    var pagoMens = pagoFrances(capitalMin, TASA_PLAZO_MAX, PLAZO_MAX) + COMISION_MENSUAL;
+    if (pagoMens > CAP.ingreso * 0.30) return false;
+  }
+  return true;
+}
+
+async function cargarCapacidad(cid) {
+  if (!dbCat || !cid) return null;
+  try {
+    var r = await dbCat.rpc('fn_colaborador', { p_id: cid });
+    if (r.error || !r.data || !r.data.length) return null;
+    var c = r.data[0];
+    return {
+      nombre:           c.nombre_completo,
+      nivel:            c.nivel_teky,
+      lineaDisponible:  Number(c.linea_disponible) || 0,
+      ingreso:          Number(c.ingreso_mensual_neto) || 0
+    };
+  } catch (e) {
+    console.error('Error leyendo capacidad:', e);
+    return null;
+  }
+}
+
 // ── LEER PARAMS DE URL (viene del scoring) ────────────────
-(function() {
+(async function() {
   var params = new URLSearchParams(window.location.search);
   var cid    = params.get('cid');
   var nivel  = params.get('nivel');
   var linea  = params.get('linea');
   // Sin identidad no hay modo calificado. El nivel por si solo se puede
   // escribir a mano en la URL; el identificador del colaborador no sirve
-  // de nada inventado, porque el simulador lo consulta en la base.
+  // de nada inventado, porque la base es la que responde.
   if (!cid || !nivel) return;
+
+  // Lo que manda es la base, no la URL.
+  CAP = await cargarCapacidad(cid);
+  if (CAP) {
+    if (CAP.nivel) nivel = CAP.nivel;
+    linea = CAP.lineaDisponible;
+  }
 
   // Preseleccionar filtro
   var nf = document.getElementById('nivelFilter');
@@ -373,7 +436,7 @@ var NIVEL_RANGES = {
     var colores  = {START:'#546E7A',FLEX:'#1565C0',PLUS:'#00796B',MAX:'#F57C00'};
     document.getElementById('bannerNivel').textContent = '¡Hola! Tu nivel es ' + (nombres[nivel]||nivel);
     document.getElementById('bannerLinea').textContent = linea
-      ? 'Línea de crédito aprobada: $' + parseInt(linea).toLocaleString('es-MX') + ' MXN'
+      ? 'Disponible para financiar: $' + parseInt(linea).toLocaleString('es-MX') + ' MXN'
       : 'Catálogo filtrado según tu calificación';
     var chip = document.getElementById('bannerChip');
     chip.textContent = nombres[nivel]||nivel;
@@ -596,13 +659,43 @@ function filterProducts() {
     if (nivel && NIVEL_RANGES[nivel]) {
       mn = p.precio_contado >= NIVEL_RANGES[nivel].min && p.precio_contado <= NIVEL_RANGES[nivel].max;
     }
-    return ms && mb && mn;
+    var mc = esAlcanzable(p.precio_contado);
+    return ms && mb && mn && mc;
   });
+
+  // Cuantos quedaron fuera solo por capacidad de compra
+  OCULTOS = 0;
+  if (CAP) {
+    OCULTOS = PRODUCTS.filter(function(p) {
+      var ms2 = !search || p.modelo.toLowerCase().indexOf(search) > -1 || p.marca.toLowerCase().indexOf(search) > -1;
+      var mb2 = !brand || p.marca === brand;
+      return ms2 && mb2 && !esAlcanzable(p.precio_contado);
+    }).length;
+  }
   if (sort === 'price_asc') filtered.sort(function(a,b) { return a.precio_contado - b.precio_contado; });
   else if (sort === 'price_desc') filtered.sort(function(a,b) { return b.precio_contado - a.precio_contado; });
   else filtered.sort(function(a,b) { return a.modelo.localeCompare(b.modelo, 'es'); });
 
   document.getElementById('countBadge').textContent = filtered.length + (filtered.length !== 1 ? ' productos' : ' producto');
+
+  // Aviso honesto: se dice que hay mas catalogo, sin mostrar lo inalcanzable
+  var notaId = 'notaCapacidad';
+  var nota   = document.getElementById(notaId);
+  if (CAP && OCULTOS > 0) {
+    if (!nota) {
+      nota = document.createElement('div');
+      nota.id = notaId;
+      nota.style.cssText = 'font-size:12px;color:#6B7A99;padding:8px 20px;line-height:1.5;background:#F5F7FA;border-bottom:1px solid #E4E8EF';
+      var g = document.getElementById('productGrid');
+      g.parentNode.insertBefore(nota, g);
+    }
+    nota.textContent = 'Se muestran los productos que puedes adquirir con tu línea disponible. '
+                     + OCULTOS + (OCULTOS === 1 ? ' producto adicional estará' : ' productos adicionales estarán')
+                     + ' a tu alcance conforme liberes línea o aumente tu calificación.';
+    nota.style.display = 'block';
+  } else if (nota) {
+    nota.style.display = 'none';
+  }
   var grid = document.getElementById('productGrid');
   if (!filtered.length) {
     grid.innerHTML = '<div class="empty-state"><p>Sin resultados</p></div>';
