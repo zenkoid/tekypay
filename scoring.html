@@ -333,7 +333,7 @@
     <div class="trust-item">⚡ 2 minutos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.4 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.5 — TekyPay 2026</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -405,7 +405,7 @@
     <div class="trust-item">🔒 Datos protegidos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.4 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.5 — TekyPay 2026</div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -715,10 +715,15 @@ async function calcularScore() {
   const lineaDisp = Number(reg.linea_disponible);
 
   if (!reg.es_nuevo) {
+    // Se muestra el nombre que ya esta registrado con esa CURP.
+    // Si no coincide con quien esta llenando el formulario, significa
+    // que la CURP esta mal escrita o es de otra persona, y conviene
+    // que lo note de inmediato.
     mostrarAviso(
-      '<strong>Ya tenias una calificacion con esta CURP.</strong><br>' +
-      'Te mostramos la linea que ya tienes asignada. Si necesitas que se ' +
-      'revise, solicitalo a traves de Recursos Humanos de tu empresa.',
+      '<strong>Esta CURP ya esta registrada a nombre de ' + reg.nombre_completo + '.</strong><br>' +
+      'Te mostramos la linea que ya tiene asignada. Los datos no se ' +
+      'actualizan desde aqui: si el nombre no es correcto o necesitas una ' +
+      'nueva revision, solicitalo a traves de Recursos Humanos de tu empresa.',
       'info'
     );
   }
