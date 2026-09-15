@@ -349,9 +349,13 @@ var NIVEL_RANGES = {
 // ── LEER PARAMS DE URL (viene del scoring) ────────────────
 (function() {
   var params = new URLSearchParams(window.location.search);
+  var cid    = params.get('cid');
   var nivel  = params.get('nivel');
   var linea  = params.get('linea');
-  if (!nivel) return;
+  // Sin identidad no hay modo calificado. El nivel por si solo se puede
+  // escribir a mano en la URL; el identificador del colaborador no sirve
+  // de nada inventado, porque el simulador lo consulta en la base.
+  if (!cid || !nivel) return;
 
   // Preseleccionar filtro
   var nf = document.getElementById('nivelFilter');
@@ -385,7 +389,7 @@ var NIVEL_RANGES = {
 // un aviso discreto indicando que el catálogo está en modo exhibición.
 (function() {
   var params = new URLSearchParams(window.location.search);
-  if (params.get('nivel')) return; // ya hay scoring: no aplica
+  if (params.get('cid')) return; // ya hay colaborador identificado: no aplica
   var esPromotor = (params.get('modo') || '').toLowerCase() === 'promotor';
   if (!esPromotor) return;
 
@@ -452,15 +456,18 @@ function buildCard(p, idx) {
   html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>';
   html += 'Ver especificaciones</button>';
   var urlProducto = 'simulador.html?producto=' + encodeURIComponent(p.modelo) + '&precio=' + p.precio_contado + '&marca=' + encodeURIComponent(p.marca);
-  var nivelUrl   = new URLSearchParams(window.location.search).get('nivel') || '';
-  var lineaUrl   = new URLSearchParams(window.location.search).get('linea') || '';
-  var ingresoUrl = new URLSearchParams(window.location.search).get('ingreso') || '';
+  var qs         = new URLSearchParams(window.location.search);
+  var cidUrl     = qs.get('cid')     || '';
+  var nivelUrl   = qs.get('nivel')   || '';
+  var lineaUrl   = qs.get('linea')   || '';
+  var ingresoUrl = qs.get('ingreso') || '';
+  if (cidUrl)     urlProducto += '&cid='     + encodeURIComponent(cidUrl);
   if (nivelUrl)   urlProducto += '&nivel='   + nivelUrl;
   if (lineaUrl)   urlProducto += '&linea='   + lineaUrl;
   if (ingresoUrl) urlProducto += '&ingreso=' + ingresoUrl;
-  // El botón solo se habilita cuando el colaborador llega con una calificación previa
-  // (presencia del parámetro 'nivel'). En modo exhibición/promotor se muestra deshabilitado.
-  if (nivelUrl) {
+  // El botón se habilita solo cuando el colaborador llega identificado (cid).
+  // Antes bastaba con el parámetro 'nivel', que cualquiera puede escribir a mano.
+  if (cidUrl) {
     html += '<button class="solicitar-btn" onclick="window.location.href=\'' + urlProducto + '\'">';
     html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
     html += 'Solicitar este producto</button>';
