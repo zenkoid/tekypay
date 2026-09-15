@@ -65,6 +65,9 @@
   .field input.error,.field select.error{border-color:var(--error)}
   .field-error{font-size:11px;color:var(--error);margin-top:3px;display:none}
   .field-hint{font-size:11px;color:var(--gray);margin-top:3px}
+  .alert-box{display:none;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.45;margin-bottom:12px}
+  .alert-error{background:#FDECEC;border:1.5px solid #E5484D;color:#8E1519}
+  .alert-info{background:#EEF4FF;border:1.5px solid var(--blue);color:#0B3A8C}
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
   /* ── CAPACITY METER ── */
@@ -197,6 +200,22 @@
 
     <div class="field-row">
       <div class="field">
+        <label>CURP <span class="req">*</span></label>
+        <input type="text" id="curp" placeholder="Ej. MASA920315MDFRTN08" maxlength="18"
+               style="text-transform:uppercase" autocomplete="off" spellcheck="false">
+        <div class="field-error" id="err_curp">CURP inválida (18 caracteres)</div>
+        <div class="field-hint">Nos permite reconocerte y llevar una sola línea de crédito a tu nombre</div>
+      </div>
+      <div class="field">
+        <label>RFC <span style="color:var(--gray);font-weight:500">(opcional)</span></label>
+        <input type="text" id="rfc" placeholder="Ej. MASA920315H12" maxlength="13"
+               style="text-transform:uppercase" autocomplete="off" spellcheck="false">
+        <div class="field-hint">Ayuda a conciliar con tu recibo de nómina</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
         <label>Edad <span class="req">*</span></label>
         <input type="number" id="edad" placeholder="Ej. 32" min="18" max="70">
         <div class="field-error" id="err_edad">Entre 18 y 70 años</div>
@@ -302,6 +321,8 @@
       <div class="field-error" id="err_privacidad" style="display:none;margin-top:6px">Debes aceptar para continuar</div>
     </div>
 
+    <div class="alert-box alert-error" id="avisoError"></div>
+
     <button class="btn-primary" id="btnCalificar" onclick="calcularScore()">
       Calcular mi Línea de Crédito
     </button>
@@ -312,7 +333,7 @@
     <div class="trust-item">⚡ 2 minutos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.3 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.4 — TekyPay 2026</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -384,7 +405,7 @@
     <div class="trust-item">🔒 Datos protegidos</div>
     <div class="trust-item">✅ LFPDPPP</div>
   </div>
-  <div class="version-tag">scoring.html v1.3 — TekyPay 2026</div>
+  <div class="version-tag">scoring.html v1.4 — TekyPay 2026</div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -444,6 +465,10 @@ const SUPABASE_URL = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
 const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ── IDENTIDAD DEL COLABORADOR EN CURSO ─────────────────────
+let _colaboradorId = null;
+let _lastDisp      = null;
+
 // ── MATRIZ DE SCORING ──────────────────────────────────────
 const NIVELES = [
   { id:'START', min:0,  max:40,  label:'TEKY START', linea_min:4000,  linea_max:7500,  color:'var(--start)', bg:'var(--start-bg)', desc:'Acceso a telefonía de entrada y accesorios tecnológicos.', cats:['Telefonía entrada','Accesorios'] },
@@ -456,11 +481,9 @@ const NIVELES = [
 async function cargarEmpresas() {
   const select = document.getElementById('empresa_id');
   try {
-    const { data, error } = await dbClient
-      .from('empresas')
-      .select('id, nombre_comercial, numero_empleados, tier')
-      .eq('estado', 'activa')
-      .order('nombre_comercial');
+    // Funcion de base de datos: devuelve solo lo que la pagina necesita.
+    // El RFC, correo y telefono del responsable ya no viajan al navegador.
+    const { data, error } = await dbClient.rpc('fn_empresas_activas');
 
     if (error) throw error;
 
@@ -580,6 +603,7 @@ function validar() {
   let ok = true;
 
   const nombre = document.getElementById('nombre').value.trim();
+  const curp   = document.getElementById('curp').value.trim().toUpperCase();
   const edad   = parseInt(document.getElementById('edad').value);
   const antig  = document.getElementById('antiguedad').value;
   const emp    = document.getElementById('empresa_id').value;
@@ -587,6 +611,7 @@ function validar() {
   const privac = document.getElementById('acepta_privacidad').checked;
 
   if (!nombre) { show('err_nombre'); document.getElementById('nombre').classList.add('error'); ok=false; }
+  if (!CURP_RE.test(curp)) { show('err_curp'); document.getElementById('curp').classList.add('error'); ok=false; }
   if (isNaN(edad)||edad<18||edad>70) { show('err_edad'); document.getElementById('edad').classList.add('error'); ok=false; }
   if (!antig) { show('err_antiguedad'); document.getElementById('antiguedad').classList.add('error'); ok=false; }
   if (!emp) { show('err_empresa_id'); document.getElementById('empresa_id').classList.add('error'); ok=false; }
@@ -597,6 +622,20 @@ function validar() {
 }
 function show(id){ const el=document.getElementById(id); if(el) el.style.display='block'; }
 
+// Formato oficial de CURP: 18 caracteres.
+const CURP_RE = /^[A-Z][AEIOUX][A-Z]{2}\d{6}[HM][A-Z]{2}[B-DF-HJ-NP-TV-Z]{3}[A-Z0-9]\d$/;
+
+function mostrarAviso(texto, tipo) {
+  const el = document.getElementById('avisoError');
+  el.className = 'alert-box ' + (tipo === 'info' ? 'alert-info' : 'alert-error');
+  el.innerHTML = texto;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function ocultarAviso() {
+  document.getElementById('avisoError').style.display = 'none';
+}
+
 // ── CALCULAR Y MOSTRAR ─────────────────────────────────────
 async function calcularScore() {
   if (!validar()) return;
@@ -605,8 +644,12 @@ async function calcularScore() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Calculando...';
 
+  ocultarAviso();
+
   const datos = {
     nombre:         document.getElementById('nombre').value.trim(),
+    curp:           document.getElementById('curp').value.trim().toUpperCase(),
+    rfc:            document.getElementById('rfc').value.trim().toUpperCase() || null,
     edad:           parseInt(document.getElementById('edad').value),
     antiguedad:     document.getElementById('antiguedad').value,
     empresa_id:     document.getElementById('empresa_id').value,
@@ -621,24 +664,63 @@ async function calcularScore() {
   const linea  = getLineaCredito(score, nivel, datos.ingreso);
   const pagoMax= (datos.ingreso - datos.gastos) * 0.30;
 
-  // Guardar en Supabase
+  // ── REGISTRAR O RECONOCER AL COLABORADOR ────────────────────
+  // Si la CURP ya existe, la funcion NO reasigna la linea:
+  // devuelve la que ya tiene. Cambiar una linea asignada es
+  // decision de TekyPay desde el panel, no del colaborador
+  // volviendo a llenar el formulario.
+  //
+  // Si esto falla, NO seguimos. Un resultado en pantalla que no
+  // quedo guardado es peor que un error visible.
+  let reg;
   try {
-    await dbClient.from('colaboradores').insert([{
-      empresa_id:           datos.empresa_id,
-      nombre_completo:      datos.nombre,
-      edad:                 datos.edad,
-      antiguedad_meses:     parseInt(datos.antiguedad),
-      ingreso_mensual_neto: datos.ingreso,
-      gastos_mensuales:     datos.gastos,
-      buro_credito:         datos.bono_buro,
-      score_calculado:      score,
-      nivel_teky:           nivel.id,
-      linea_credito_asignada: linea,
-      linea_disponible:     linea,
-    }]);
+    const { data, error } = await dbClient.rpc('fn_registrar_colaborador', {
+      p_curp:       datos.curp,
+      p_empresa_id: datos.empresa_id,
+      p_nombre:     datos.nombre,
+      p_edad:       datos.edad,
+      p_antiguedad: parseInt(datos.antiguedad),
+      p_ingreso:    datos.ingreso,
+      p_gastos:     datos.gastos,
+      p_buro:       datos.bono_buro,
+      p_score:      score,
+      p_nivel:      nivel.id,
+      p_linea:      linea,
+      p_rfc:        datos.rfc,
+    });
+
+    if (error) throw error;
+    if (!data || !data.length) throw new Error('La base no devolvio el registro');
+    reg = data[0];
+
   } catch(e) {
-    console.error('Error guardando colaborador:', e);
-    // No bloqueamos — mostramos el resultado igual
+    console.error('Error registrando colaborador:', e);
+    mostrarAviso(
+      '<strong>No pudimos guardar tu calificacion.</strong><br>' +
+      'Revisa tu conexion e intentalo de nuevo. Si el problema sigue, ' +
+      'avisa a Recursos Humanos de tu empresa.',
+      'error'
+    );
+    btn.disabled  = false;
+    btn.innerHTML = 'Calcular mi Linea de Credito';
+    return;
+  }
+
+  // Guardar identidad para el resto del recorrido
+  _colaboradorId = reg.colaborador_id;
+
+  // La linea que manda es la de la base, no la recien calculada.
+  const nivelReal = NIVELES.find(n => n.id === reg.nivel_teky) || nivel;
+  const lineaReal = Number(reg.linea_credito_asignada);
+  const lineaDisp = Number(reg.linea_disponible);
+
+  if (!reg.es_nuevo) {
+    mostrarAviso(
+      '<strong>Ya tenias una calificacion con esta CURP.</strong><br>' +
+      'Te mostramos la linea que ya tienes asignada. Si necesitas que se ' +
+      'revise, solicitalo a traves de Recursos Humanos de tu empresa.',
+      'info'
+    );
   }
 
   // ── ANTIGÜEDAD < 6 MESES: no aplica a crédito ──
@@ -660,17 +742,18 @@ async function calcularScore() {
   document.getElementById('s2').className = 'step-item done';
   document.getElementById('s3').className = 'step-item active';
 
-  mostrarResultado(score, nivel, linea, datos, pagoMax);
+  mostrarResultado(score, nivelReal, lineaReal, lineaDisp, datos, pagoMax);
 
   btn.disabled = false;
   btn.innerHTML = 'Calcular mi Línea de Crédito';
 }
 
-function mostrarResultado(score, nivel, linea, datos, pagoMax) {
+function mostrarResultado(score, nivel, linea, lineaDisp, datos, pagoMax) {
   // Guardar para URL del catálogo
   _lastIngreso = datos.ingreso;
   _lastNivel   = nivel.id;
   _lastLinea   = linea;
+  _lastDisp    = (lineaDisp === undefined || lineaDisp === null) ? linea : lineaDisp;
 
   // Ocultar form, mostrar resultado
   document.getElementById('formSection').style.display = 'none';
@@ -689,6 +772,21 @@ function mostrarResultado(score, nivel, linea, datos, pagoMax) {
   document.getElementById('nivelName').style.color = nivel.color;
   document.getElementById('nivelLinea').textContent = '$' + Math.round(linea).toLocaleString('es-MX');
   document.getElementById('nivelLinea').style.color = nivel.color;
+
+  // Si ya tiene creditos vigentes, lo que puede usar hoy es menos
+  // que su linea autorizada. Se lo decimos, no lo escondemos.
+  const lblLinea = document.querySelector('.nivel-linea-label');
+  if (lblLinea && _lastDisp < linea - 1) {
+    let nota = document.getElementById('notaDisponible');
+    if (!nota) {
+      nota = document.createElement('div');
+      nota.id = 'notaDisponible';
+      nota.style.cssText = 'font-size:12px;opacity:.85;margin-top:6px;line-height:1.4';
+      lblLinea.parentNode.appendChild(nota);
+    }
+    nota.textContent = 'Disponible hoy: $' + Math.round(_lastDisp).toLocaleString('es-MX') +
+                       ' \u2014 el resto esta comprometido en creditos vigentes.';
+  }
   document.getElementById('nivelDesc').textContent = nivel.desc;
 
   // Score ring animado
@@ -733,11 +831,20 @@ function mostrarResultado(score, nivel, linea, datos, pagoMax) {
 }
 
 function irCatalogo() {
-  const nivelName  = document.getElementById('nivelName').textContent;
-  const nivelId    = nivelName.replace('TEKY ','').trim();
-  const lineaText  = document.getElementById('nivelLinea').textContent.replace(/[$,]/g,'').trim();
-  const ingresoVal = getRawValue('ingreso');
-  window.location.href = 'catalogo.html?nivel=' + nivelId + '&linea=' + lineaText + '&ingreso=' + Math.round(ingresoVal);
+  if (!_colaboradorId) {
+    mostrarAviso('No pudimos identificar tu registro. Vuelve a calcular tu linea.', 'error');
+    return;
+  }
+  // cid = identidad del colaborador. El simulador lee nivel y linea
+  // DE LA BASE usando este id; los demas parametros son solo para
+  // que el catalogo filtre y muestre, y no tienen validez por si solos.
+  const params = new URLSearchParams({
+    cid:     _colaboradorId,
+    nivel:   _lastNivel,
+    linea:   Math.round(_lastDisp),
+    ingreso: Math.round(_lastIngreso)
+  });
+  window.location.href = 'catalogo.html?' + params.toString();
 }
 
 function reiniciar() {
