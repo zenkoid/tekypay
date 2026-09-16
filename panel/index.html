@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="same-origin">
+<title>TekyPay — Panel de operación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PANEL DE OPERACIÓN · TEKYPAY
+   Módulo 1: acceso, tablero y bandeja de solicitudes
+   ============================================================ */
+:root{
+  --azul:#0047BA; --azul-osc:#003494; --azul-suave:#EAF1FD;
+  --verde:#84BD00; --verde-osc:#5E8700; --verde-suave:#F1F8E0;
+  --tinta:#2B2B2B; --gris:#5B6780; --gris-claro:#8A94A8;
+  --linea:#DCE2EC; --fondo:#F4F6FA; --blanco:#FFFFFF;
+  --rojo:#C62828; --rojo-suave:#FDECEC;
+  --ambar:#B26A00; --ambar-suave:#FFF4E0;
+  --radio:10px;
+  --fuente:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--fuente);background:var(--fondo);color:var(--tinta);font-size:15px;line-height:1.45;min-height:100vh}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid rgba(0,71,186,.45);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── ACCESO ─────────────────────────────────────────────── */
+.acceso{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 18px;
+  background:linear-gradient(180deg,var(--azul-osc) 0,var(--azul) 44%,var(--fondo) 44%)}
+.acceso-caja{width:100%;max-width:380px;background:var(--blanco);border-radius:16px;padding:28px 24px 24px;
+  box-shadow:0 18px 40px -18px rgba(0,52,148,.45)}
+.acceso-caja img{height:44px;display:block;margin-bottom:18px}
+.acceso-caja h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.acceso-caja p.sub{color:var(--gris);font-size:14px;margin:4px 0 22px}
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.campo input{width:100%;padding:12px 13px;border:1.5px solid var(--linea);border-radius:var(--radio);font-size:16px;background:var(--blanco)}
+.campo input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,71,186,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:var(--radio);
+  font-weight:700;padding:12px 18px;font-size:15px;transition:background .15s}
+.btn-primario{background:var(--azul);color:#fff;width:100%;padding:14px}
+.btn-primario:hover{background:var(--azul-osc)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-texto{background:none;color:var(--azul);padding:8px 10px}
+.btn-texto:hover{background:var(--azul-suave)}
+.aviso{border-radius:var(--radio);padding:11px 13px;font-size:14px;margin-bottom:14px}
+.aviso-error{background:var(--rojo-suave);color:#8E1519;border:1.5px solid #E5A3A3}
+.aviso-info{background:var(--azul-suave);color:#0B3A8C;border:1.5px solid #B9CFF3}
+.acceso-pie{font-size:12px;color:var(--gris-claro);margin-top:18px;text-align:center}
+.giro{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:giro .7s linear infinite}
+@keyframes giro{to{transform:rotate(360deg)}}
+
+/* ── ESTRUCTURA ─────────────────────────────────────────── */
+.barra{background:var(--blanco);border-bottom:3px solid var(--verde);position:sticky;top:0;z-index:20}
+.barra-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 16px}
+.barra img{height:30px;display:block}
+.barra .titulo{font-weight:800;font-size:15px;color:var(--azul);white-space:nowrap}
+.nav-sup{display:none;gap:4px;margin-left:12px}
+.nav-sup a{text-decoration:none;color:var(--gris);font-weight:700;font-size:14px;padding:8px 12px;border-radius:8px}
+.nav-sup a[aria-current="page"]{color:var(--azul);background:var(--azul-suave)}
+.usuario{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gris);min-width:0}
+.usuario .nombre{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+main{max-width:1120px;margin:0 auto;padding:16px 16px 96px}
+
+.nav-inf{position:fixed;bottom:0;left:0;right:0;background:var(--blanco);border-top:1px solid var(--linea);
+  display:grid;grid-template-columns:repeat(3,1fr);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+.nav-inf a{text-decoration:none;color:var(--gris);font-size:12px;font-weight:700;display:flex;flex-direction:column;
+  align-items:center;gap:3px;padding:9px 4px 10px}
+.nav-inf a svg{width:22px;height:22px}
+.nav-inf a[aria-current="page"]{color:var(--azul)}
+
+@media (min-width:900px){
+  .nav-sup{display:flex}
+  .nav-inf{display:none}
+  main{padding:24px 24px 48px}
+  .usuario .nombre{max-width:220px}
+}
+
+.franja-prueba{background:var(--ambar-suave);color:var(--ambar);font-size:13px;font-weight:700;text-align:center;padding:7px 12px;border-bottom:1px solid #F1D29E}
+
+/* ── RECORRIDO (el tablero) ─────────────────────────────── */
+.recorrido{display:flex;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 4px;gap:0}
+.recorrido::-webkit-scrollbar{display:none}
+.etapa{flex:1 0 112px;border:none;background:var(--blanco);color:var(--azul);text-align:left;
+  padding:12px 22px 12px 26px;margin-left:-10px;position:relative;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);
+  transition:background .15s,color .15s}
+.etapa:first-child{margin-left:0;padding-left:16px;border-radius:var(--radio) 0 0 var(--radio);
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%)}
+.etapa .cuenta{display:block;font-size:26px;font-weight:800;line-height:1.05}
+.etapa .nom{display:block;font-size:12.5px;font-weight:700;color:var(--gris);white-space:nowrap}
+.etapa:hover{background:var(--azul-suave)}
+.etapa[aria-pressed="true"]{background:var(--azul);color:#fff}
+.etapa[aria-pressed="true"] .nom{color:rgba(255,255,255,.85)}
+.etapa.vacia .cuenta{color:var(--gris-claro)}
+.etapa[aria-pressed="true"].vacia .cuenta{color:rgba(255,255,255,.7)}
+
+.cerradas{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;align-items:center}
+.cerradas .rotulo{font-size:13px;color:var(--gris);margin-right:2px}
+.ficha-filtro{border:1.5px solid var(--linea);background:var(--blanco);border-radius:999px;padding:5px 12px;
+  font-size:13px;font-weight:700;color:var(--gris)}
+.ficha-filtro b{color:var(--tinta);margin-left:4px}
+.ficha-filtro[aria-pressed="true"]{border-color:var(--azul);color:var(--azul);background:var(--azul-suave)}
+
+.cifras{display:grid;grid-template-columns:repeat(3,1fr);margin:16px 0 0;background:var(--blanco);
+  border-radius:var(--radio);border:1px solid var(--linea)}
+.cifra{padding:12px 12px 13px}
+.cifra + .cifra{border-left:1px solid var(--linea)}
+.cifra .v{font-size:18px;font-weight:800;display:block;line-height:1.2}
+.cifra .l{font-size:12px;color:var(--gris);display:block}
+.cifra.alerta .v{color:var(--rojo)}
+@media (min-width:600px){.cifra{padding:14px 18px}.cifra .v{font-size:22px}.cifra .l{font-size:13px}}
+
+/* ── HERRAMIENTAS DE LA BANDEJA ─────────────────────────── */
+.herr{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 10px}
+.herr h2{font-size:18px;font-weight:800;margin-right:auto}
+.buscar{position:relative;flex:1 1 100%}
+.buscar input{width:100%;padding:11px 12px 11px 38px;border:1.5px solid var(--linea);border-radius:var(--radio);font-size:16px;background:var(--blanco)}
+.buscar input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,71,186,.12)}
+.buscar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--gris-claro)}
+.interruptor{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gris);font-weight:700;user-select:none}
+.interruptor input{appearance:none;width:38px;height:22px;border-radius:999px;background:var(--linea);position:relative;transition:background .15s;flex-shrink:0}
+.interruptor input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.interruptor input:checked{background:var(--ambar)}
+.interruptor input:checked::after{left:19px}
+.meta-lista{font-size:13px;color:var(--gris);margin:0 0 8px}
+.herr .interruptor{order:3}
+.herr .buscar{order:2}
+@media (min-width:900px){
+  .herr .interruptor{order:0}
+  .herr #btnActualizar{order:1}
+  .herr .buscar{order:2;flex:0 1 340px}
+}
+
+/* ── LISTA DE SOLICITUDES ───────────────────────────────── */
+.lista{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden}
+.fila{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:13px 14px;text-decoration:none;color:inherit;
+  border-top:1px solid var(--linea)}
+.fila:first-child{border-top:none}
+.fila:hover{background:#F8FAFD}
+.fila .quien{min-width:0}
+.fila .nom-col,.fila .empresa{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fila .nom-col{font-weight:800;font-size:15px}
+.fila .empresa{font-size:12.5px;color:var(--gris)}
+.fila .monto{font-weight:800;text-align:right}
+.fila .detalle{font-size:13px;color:var(--gris);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fila .lado{font-size:12.5px;color:var(--gris);text-align:right;white-space:nowrap}
+.fila .marcas{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;align-items:center}
+.folio{font-weight:700;color:var(--azul)}
+.estado{font-size:12px;font-weight:800;border-radius:6px;padding:2px 8px}
+.e-solicitada{background:var(--azul-suave);color:var(--azul)}
+.e-aprobada{background:var(--verde-suave);color:var(--verde-osc)}
+.e-formalizada{background:#E4ECFA;color:var(--azul-osc)}
+.e-activa{background:var(--verde);color:#fff}
+.e-liquidada{background:#ECEFF3;color:var(--gris)}
+.e-rechazada{background:var(--rojo-suave);color:var(--rojo)}
+.e-cancelada{background:#F3ECEC;color:#8A5A5A}
+.marca-prueba{font-size:12px;font-weight:800;color:var(--ambar);background:var(--ambar-suave);border-radius:6px;padding:2px 8px}
+.marca-atraso{font-size:12px;font-weight:800;color:var(--rojo)}
+.marca-saldo{font-size:12.5px;color:var(--gris)}
+
+@media (min-width:900px){
+  .fila{grid-template-columns:110px minmax(0,1.3fr) minmax(0,1fr) 190px 130px;align-items:center;gap:0 16px;padding:12px 18px}
+  .fila .c-folio{order:0}
+  .fila .quien{order:1}
+  .fila .detalle{order:2}
+  .fila .marcas{order:3;grid-column:auto;margin:0}
+  .fila .monto{order:4}
+  .fila .lado{display:none}
+  .encabezado-lista{display:grid!important}
+}
+.encabezado-lista{display:none;grid-template-columns:110px minmax(0,1.3fr) minmax(0,1fr) 190px 130px;gap:0 16px;
+  padding:10px 18px;font-size:12.5px;font-weight:700;color:var(--gris);background:#F8FAFD;border-bottom:1px solid var(--linea)}
+.encabezado-lista span:last-child{text-align:right}
+.c-folio{display:none}
+@media (min-width:900px){.c-folio{display:block;font-size:14px}[data-movil]{display:none}}
+
+.vacio{padding:36px 20px;text-align:center;color:var(--gris)}
+.vacio strong{display:block;color:var(--tinta);font-size:16px;margin-bottom:4px}
+.cargando{padding:28px;text-align:center;color:var(--gris)}
+.esqueleto{height:62px;border-top:1px solid var(--linea);background:linear-gradient(90deg,#fff 0,#F2F5FA 50%,#fff 100%);background-size:200% 100%;animation:brillo 1.2s linear infinite}
+.esqueleto:first-child{border-top:none}
+@keyframes brillo{to{background-position:-200% 0}}
+
+/* ── PANTALLAS EN CONSTRUCCIÓN ─────────────────────────── */
+.proximo{background:var(--blanco);border:1px dashed var(--linea);border-radius:var(--radio);padding:32px 22px;max-width:560px}
+.proximo h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.proximo p{color:var(--gris);margin-bottom:6px}
+.volver{display:inline-block;margin-bottom:14px;color:var(--azul);font-weight:700;text-decoration:none}
+
+/* ── AVISO FLOTANTE ─────────────────────────────────────── */
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--tinta);color:#fff;
+  padding:11px 16px;border-radius:var(--radio);font-size:14px;max-width:calc(100% - 32px);z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.error{background:#8E1519}
+@media (min-width:900px){.toast{bottom:24px}}
+
+.version{font-size:11px;color:var(--gris-claro);text-align:center;margin-top:28px}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PANTALLA DE ACCESO
+     ============================================================ -->
+<section class="acceso" id="vistaAcceso" hidden>
+  <form class="acceso-caja" id="formAcceso" novalidate>
+    <img src="../img/TekyPayLogo.jpeg" alt="TekyPay">
+    <h1>Panel de operación</h1>
+    <p class="sub">Acceso exclusivo para el equipo de TekyPay.</p>
+    <div class="aviso aviso-error" id="accesoError" role="alert" hidden></div>
+    <div class="aviso aviso-info" id="accesoInfo" role="status" hidden></div>
+    <div class="campo">
+      <label for="correo">Correo</label>
+      <input id="correo" type="email" autocomplete="username" inputmode="email" required>
+    </div>
+    <div class="campo">
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="btn btn-primario" id="btnEntrar" type="submit">Entrar</button>
+    <p class="acceso-pie">¿Olvidaste tu contraseña? Solicítala al administrador del panel.</p>
+  </form>
+</section>
+
+<!-- ============================================================
+     APLICACIÓN
+     ============================================================ -->
+<div id="vistaApp" hidden>
+  <header class="barra">
+    <div class="barra-in">
+      <img src="../img/TekyPayLogo.jpeg" alt="TekyPay">
+      <span class="titulo">Operación</span>
+      <nav class="nav-sup" aria-label="Secciones">
+        <a href="#solicitudes" data-seccion="solicitudes">Solicitudes</a>
+        <a href="#corte" data-seccion="corte">Corte</a>
+        <a href="#cartera" data-seccion="cartera">Cartera</a>
+      </nav>
+      <div class="usuario">
+        <span class="nombre" id="nombreOperador"></span>
+        <button class="btn btn-texto" id="btnSalir" type="button">Salir</button>
+      </div>
+    </div>
+  </header>
+  <div class="franja-prueba" id="franjaPrueba" hidden>Estás viendo también los datos de prueba</div>
+
+  <main id="contenido"></main>
+
+  <nav class="nav-inf" aria-label="Secciones">
+    <a href="#solicitudes" data-seccion="solicitudes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+      Solicitudes
+    </a>
+    <a href="#corte" data-seccion="corte">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14l2.5 2.5L16 13"/></svg>
+      Corte
+    </a>
+    <a href="#cartera" data-seccion="cartera">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      Cartera
+    </a>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   CONFIGURACIÓN
+   La llave es la pública. Esta página no puede leer ninguna
+   tabla: todo pasa por funciones de la base que exigen una
+   sesión de operador activo.
+   ============================================================ */
+const PANEL_VERSION = 'panel v1.0 — módulo 1';
+const SUPABASE_URL  = 'https://fygespxcsymiccwixzdc.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
+const MINUTOS_INACTIVIDAD = 30;
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, storageKey: 'tekypay-panel-sesion' }
+});
+
+/* ============================================================
+   ESTADO DE LA PÁGINA
+   ============================================================ */
+const estado = {
+  operador: null,
+  incluirPrueba: false,          // apagado de inicio (acuerdo del status)
+  filtroEstado: 'solicitada',    // la bandeja abre en lo pendiente de decidir
+  buscar: '',
+  resumen: null,
+  bandeja: [],
+};
+
+const ETAPAS = [
+  { id: 'solicitada',  nombre: 'Por decidir' },
+  { id: 'aprobada',    nombre: 'Aprobadas' },
+  { id: 'formalizada', nombre: 'Formalizadas' },
+  { id: 'activa',      nombre: 'Activas' },
+];
+const CERRADAS = [
+  { id: 'liquidada', nombre: 'Liquidadas' },
+  { id: 'rechazada', nombre: 'Rechazadas' },
+  { id: 'cancelada', nombre: 'Canceladas' },
+];
+const NOMBRE_ESTADO = {
+  solicitada: 'Por decidir', aprobada: 'Aprobada', formalizada: 'Formalizada',
+  activa: 'Activa', liquidada: 'Liquidada', rechazada: 'Rechazada', cancelada: 'Cancelada'
+};
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+const $ = (sel, raiz = document) => raiz.querySelector(sel);
+
+// Todo dato que viene de la base se escapa antes de pintarlo:
+// los nombres los captura el público en el formulario de scoring.
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function mxn(n) {
+  const v = Number(n) || 0;
+  return '$' + v.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function mxnCorto(n) {
+  const v = Number(n) || 0;
+  return '$' + v.toLocaleString('es-MX', { maximumFractionDigits: 0 });
+}
+function fecha(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Mexico_City' });
+}
+function hace(iso) {
+  if (!iso) return '';
+  const dias = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (dias <= 0) return 'hoy';
+  if (dias === 1) return 'ayer';
+  if (dias < 30) return 'hace ' + dias + ' días';
+  return fecha(iso);
+}
+const PERIODO = { semanal: 'semanales', quincenal: 'quincenales', mensual: 'mensuales' };
+
+let toastTimer;
+function aviso(texto, tipo) {
+  const t = $('#toast');
+  t.textContent = texto;
+  t.className = 'toast' + (tipo === 'error' ? ' error' : '');
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, tipo === 'error' ? 6000 : 3500);
+}
+
+/* ============================================================
+   LLAMADAS A LA BASE
+   Un solo punto de entrada. Traduce los errores a mensajes
+   que un operador entienda y cierra la sesión si la base
+   dice que ya no hay acceso.
+   ============================================================ */
+async function rpc(nombre, params) {
+  let res;
+  try {
+    res = await db.rpc(nombre, params || {});
+  } catch (e) {
+    throw new Error('Sin conexión con el servidor. Revisa tu internet e inténtalo de nuevo.');
+  }
+  if (res.error) {
+    const msg = res.error.message || '';
+    if (res.error.code === '42501' || /no autorizado|permission denied|JWT/i.test(msg)) {
+      await cerrarSesion('Tu sesión ya no es válida. Vuelve a entrar.');
+      throw new Error('Sesión no válida');
+    }
+    if (/Failed to fetch|NetworkError/i.test(msg)) {
+      throw new Error('Sin conexión con el servidor. Revisa tu internet e inténtalo de nuevo.');
+    }
+    // Las funciones del panel ya devuelven mensajes en español
+    throw new Error(msg);
+  }
+  return res.data;
+}
+
+/* ============================================================
+   ACCESO
+   ============================================================ */
+function mostrarAcceso(mensaje, tipo) {
+  $('#vistaApp').hidden = true;
+  $('#vistaAcceso').hidden = false;
+  const err = $('#accesoError'), inf = $('#accesoInfo');
+  err.hidden = inf.hidden = true;
+  if (mensaje) {
+    const el = tipo === 'info' ? inf : err;
+    el.textContent = mensaje;
+    el.hidden = false;
+  }
+  setTimeout(() => $('#correo').focus(), 50);
+}
+
+$('#formAcceso').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const correo = $('#correo').value.trim().toLowerCase();
+  const clave  = $('#clave').value;
+  const err = $('#accesoError');
+  err.hidden = true; $('#accesoInfo').hidden = true;
+
+  if (!correo || !clave) {
+    err.textContent = 'Escribe tu correo y tu contraseña.';
+    err.hidden = false;
+    return;
+  }
+
+  const btn = $('#btnEntrar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="giro" aria-hidden="true"></span>Entrando';
+
+  try {
+    const { error } = await db.auth.signInWithPassword({ email: correo, password: clave });
+    if (error) {
+      const m = error.message || '';
+      if (/Invalid login credentials/i.test(m))   throw new Error('Correo o contraseña incorrectos.');
+      if (/Email not confirmed/i.test(m))         throw new Error('La cuenta no está confirmada. Pide al administrador que la confirme.');
+      if (/rate limit|too many/i.test(m))         throw new Error('Demasiados intentos. Espera unos minutos y vuelve a intentarlo.');
+      if (/fetch|network/i.test(m))               throw new Error('Sin conexión con el servidor. Revisa tu internet e inténtalo de nuevo.');
+      throw new Error('No fue posible entrar: ' + m);
+    }
+    $('#clave').value = '';
+    await entrar();
+  } catch (e) {
+    err.textContent = e.message;
+    err.hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+});
+
+// Con sesión abierta, confirma que sea de un operador activo.
+// Tener cuenta no basta: la lista de operadores la controla la base.
+async function entrar() {
+  let esOperador = false;
+  try {
+    esOperador = await rpc('fn_es_operador');
+  } catch (e) {
+    mostrarAcceso(e.message);
+    return;
+  }
+  if (!esOperador) {
+    await db.auth.signOut();
+    mostrarAcceso('Esta cuenta no tiene acceso al panel. Pide al administrador que la habilite.');
+    return;
+  }
+
+  const datos = await rpc('fn_panel_operador');
+  estado.operador = (datos && datos[0]) ? datos[0].nombre : '';
+  $('#nombreOperador').textContent = estado.operador;
+
+  $('#vistaAcceso').hidden = true;
+  $('#vistaApp').hidden = false;
+  vigilarInactividad();
+  if (!location.hash) location.hash = '#solicitudes';
+  else enrutar();
+}
+
+async function cerrarSesion(mensaje) {
+  clearTimeout(inactividadTimer);
+  estado.operador = null;
+  estado.bandeja = [];
+  estado.resumen = null;
+  $('#contenido').innerHTML = '';
+  $('#vistaApp').hidden = true;
+  try { await db.auth.signOut(); } catch (e) { /* sin red: la sesión local se descarta igual */ }
+  mostrarAcceso(mensaje, 'info');
+}
+
+$('#btnSalir').addEventListener('click', () => cerrarSesion('Sesión cerrada.'));
+
+// Cierre por inactividad: el panel maneja datos personales y
+// suele quedar abierto en equipos compartidos.
+let inactividadTimer, vigilando = false;
+function vigilarInactividad() {
+  const reiniciar = () => {
+    clearTimeout(inactividadTimer);
+    inactividadTimer = setTimeout(() =>
+      cerrarSesion('Cerramos tu sesión tras ' + MINUTOS_INACTIVIDAD + ' minutos sin actividad.'),
+      MINUTOS_INACTIVIDAD * 60000);
+  };
+  if (!vigilando) {
+    ['click', 'keydown', 'touchstart', 'scroll'].forEach(ev =>
+      document.addEventListener(ev, reiniciar, { passive: true }));
+    vigilando = true;
+  }
+  reiniciar();
+}
+
+/* ============================================================
+   NAVEGACIÓN
+   #solicitudes          bandeja (módulo 1)
+   #solicitud/<id>       ficha (módulo 2)
+   #corte                registro de cobros (módulo 4)
+   #cartera              saldos y atrasos (módulo 5)
+   ============================================================ */
+function enrutar() {
+  if ($('#vistaApp').hidden) return;
+  const [seccion, param] = location.hash.replace(/^#/, '').split('/');
+  const activa = (seccion === 'solicitud') ? 'solicitudes' : seccion;
+  document.querySelectorAll('[data-seccion]').forEach(a => {
+    if (a.dataset.seccion === activa) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  });
+  window.scrollTo(0, 0);
+
+  switch (seccion) {
+    case 'solicitud': return vistaFichaPendiente(param);
+    case 'corte':     return vistaPendiente('Corte de cobros',
+      'Aquí registrarás, después de cada nómina, qué cobros aplicó Quentli y cuáles no.');
+    case 'cartera':   return vistaPendiente('Cartera',
+      'Aquí verás el saldo de cada crédito, los atrasos y el próximo cobro.');
+    default:          return vistaSolicitudes();
+  }
+}
+window.addEventListener('hashchange', enrutar);
+
+function vistaPendiente(titulo, texto) {
+  $('#contenido').innerHTML =
+    '<div class="proximo"><h2>' + esc(titulo) + '</h2>' +
+    '<p>' + esc(texto) + '</p>' +
+    '<p>Esta sección se incorpora en un siguiente módulo del panel.</p></div>' +
+    '<p class="version">' + PANEL_VERSION + '</p>';
+}
+
+function vistaFichaPendiente(id) {
+  const s = estado.bandeja.find(x => x.solicitud_id === id);
+  $('#contenido').innerHTML =
+    '<a class="volver" href="#solicitudes">Volver a solicitudes</a>' +
+    '<div class="proximo"><h2>' + (s ? 'Solicitud ' + esc(s.folio) : 'Solicitud') + '</h2>' +
+    (s ? '<p>' + esc(s.nombre_completo) + ' solicita ' + esc(s.producto) + '.</p>' : '') +
+    '<p>La ficha completa, con la aprobación y el rechazo, llega en el módulo 2.</p></div>';
+}
+
+/* ============================================================
+   VISTA: SOLICITUDES (tablero + bandeja)
+   ============================================================ */
+function vistaSolicitudes() {
+  $('#contenido').innerHTML = `
+    <div class="recorrido" id="recorrido" role="group" aria-label="Solicitudes por etapa"></div>
+    <div class="cerradas" id="cerradas" role="group" aria-label="Solicitudes cerradas"></div>
+    <div class="cifras" id="cifras" aria-live="polite"></div>
+
+    <div class="herr">
+      <h2 id="tituloLista">Solicitudes</h2>
+      <button class="btn btn-texto" id="btnActualizar" type="button">Actualizar</button>
+      <label class="interruptor">
+        <input type="checkbox" id="chkPrueba" ${estado.incluirPrueba ? 'checked' : ''}>
+        Mostrar datos de prueba
+      </label>
+      <div class="buscar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="txtBuscar" placeholder="Buscar por folio, nombre o CURP"
+               aria-label="Buscar solicitudes" value="${esc(estado.buscar)}" autocomplete="off">
+      </div>
+    </div>
+    <p class="meta-lista" id="metaLista"></p>
+    <div class="lista" id="lista" aria-live="polite"></div>
+    <p class="version">${PANEL_VERSION}</p>
+  `;
+
+  $('#chkPrueba').addEventListener('change', (e) => {
+    estado.incluirPrueba = e.target.checked;
+    $('#franjaPrueba').hidden = !estado.incluirPrueba;
+    cargarTodo();
+  });
+  $('#btnActualizar').addEventListener('click', () => cargarTodo());
+
+  let t;
+  $('#txtBuscar').addEventListener('input', (e) => {
+    clearTimeout(t);
+    t = setTimeout(() => { estado.buscar = e.target.value.trim(); cargarBandeja(); }, 350);
+  });
+
+  pintarRecorrido();
+  cargarTodo();
+}
+
+function elegirEstado(id) {
+  estado.filtroEstado = (estado.filtroEstado === id && id !== 'solicitada') ? null : id;
+  pintarRecorrido();
+  cargarBandeja();
+}
+
+function pintarRecorrido() {
+  const cuentas = (estado.resumen && estado.resumen.por_estado) || {};
+  const rec = $('#recorrido');
+  if (!rec) return;
+
+  rec.innerHTML = ETAPAS.map(e => {
+    const n = cuentas[e.id] || 0;
+    return `<button type="button" class="etapa ${n ? '' : 'vacia'}" data-estado="${e.id}"
+              aria-pressed="${estado.filtroEstado === e.id}">
+              <span class="cuenta num">${estado.resumen ? n : '–'}</span>
+              <span class="nom">${e.nombre}</span>
+            </button>`;
+  }).join('');
+
+  $('#cerradas').innerHTML =
+    '<span class="rotulo">Cerradas</span>' +
+    CERRADAS.map(e => `<button type="button" class="ficha-filtro" data-estado="${e.id}"
+        aria-pressed="${estado.filtroEstado === e.id}">${e.nombre}<b class="num">${estado.resumen ? (cuentas[e.id] || 0) : '–'}</b></button>`).join('') +
+    `<button type="button" class="ficha-filtro" data-estado="todas" aria-pressed="${estado.filtroEstado === null}">Todas</button>`;
+
+  document.querySelectorAll('#recorrido [data-estado], #cerradas [data-estado]').forEach(b =>
+    b.addEventListener('click', () => {
+      if (b.dataset.estado === 'todas') { estado.filtroEstado = null; pintarRecorrido(); cargarBandeja(); }
+      else elegirEstado(b.dataset.estado);
+    }));
+
+  const r = estado.resumen;
+  $('#cifras').innerHTML = r ? `
+      <div class="cifra"><span class="v num">${mxnCorto(r.cartera_saldo)}</span><span class="l">Saldo en cobranza</span></div>
+      <div class="cifra ${Number(r.cartera_vencida) > 0 ? 'alerta' : ''}"><span class="v num">${mxnCorto(r.cartera_vencida)}</span><span class="l">Monto vencido</span></div>
+      <div class="cifra ${Number(r.creditos_con_atraso) > 0 ? 'alerta' : ''}"><span class="v num">${r.creditos_con_atraso} de ${r.creditos_en_cobro}</span><span class="l">Créditos con atraso</span></div>`
+    : `<div class="cifra"><span class="v">–</span><span class="l">Saldo en cobranza</span></div>
+       <div class="cifra"><span class="v">–</span><span class="l">Monto vencido</span></div>
+       <div class="cifra"><span class="v">–</span><span class="l">Créditos con atraso</span></div>`;
+}
+
+async function cargarTodo() {
+  await Promise.all([cargarResumen(), cargarBandeja()]);
+}
+
+async function cargarResumen() {
+  try {
+    estado.resumen = await rpc('fn_panel_resumen', { p_incluir_prueba: estado.incluirPrueba });
+    pintarRecorrido();
+  } catch (e) {
+    if (e.message !== 'Sesión no válida') aviso(e.message, 'error');
+  }
+}
+
+let turnoBandeja = 0;   // descarta respuestas viejas si el operador teclea rápido
+async function cargarBandeja() {
+  const lista = $('#lista');
+  if (!lista) return;
+  const turno = ++turnoBandeja;
+
+  const nombreFiltro = estado.filtroEstado
+    ? (ETAPAS.concat(CERRADAS).find(e => e.id === estado.filtroEstado) || {}).nombre
+    : 'Todas las solicitudes';
+  $('#tituloLista').textContent = nombreFiltro;
+  $('#metaLista').textContent = 'Cargando…';
+  lista.innerHTML = '<div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div>';
+
+  try {
+    const datos = await rpc('fn_panel_bandeja', {
+      p_estado: estado.filtroEstado,
+      p_buscar: estado.buscar || null,
+      p_incluir_prueba: estado.incluirPrueba,
+    });
+    if (turno !== turnoBandeja) return;
+    estado.bandeja = datos || [];
+    pintarBandeja();
+  } catch (e) {
+    if (turno !== turnoBandeja) return;
+    $('#metaLista').textContent = '';
+    lista.innerHTML = `<div class="vacio"><strong>No se pudo cargar la bandeja</strong>${esc(e.message)}</div>`;
+  }
+}
+
+function pintarBandeja() {
+  const filas = estado.bandeja;
+  const lista = $('#lista');
+  const n = filas.length;
+
+  $('#metaLista').textContent = n === 0 ? '' :
+    n + (n === 1 ? ' solicitud' : ' solicitudes') +
+    (estado.buscar ? ' que coinciden con “' + estado.buscar + '”' : '') +
+    (n >= 500 ? '. Se muestran las 500 más recientes: usa la búsqueda para acotar.' : '');
+
+  if (n === 0) {
+    let msg;
+    if (estado.buscar)                         msg = '<strong>Sin coincidencias</strong>Revisa el folio, el nombre o la CURP.';
+    else if (estado.filtroEstado === 'solicitada') msg = '<strong>No hay solicitudes por decidir</strong>Las nuevas aparecerán aquí en cuanto un colaborador genere su solicitud.';
+    else                                       msg = '<strong>No hay solicitudes en esta etapa</strong>';
+    if (!estado.incluirPrueba) msg += '<br><br>Los datos de prueba están ocultos.';
+    lista.innerHTML = '<div class="vacio">' + msg + '</div>';
+    return;
+  }
+
+  lista.innerHTML =
+    `<div class="encabezado-lista"><span>Folio</span><span>Colaborador</span><span>Producto</span><span>Estado</span><span>Financiado</span></div>` +
+    filas.map(s => {
+      const enCobro = ['formalizada', 'activa', 'liquidada'].includes(s.estado);
+      const vencidas = Number(s.cuotas_vencidas) || 0;
+      return `
+      <a class="fila" href="#solicitud/${esc(s.solicitud_id)}">
+        <span class="c-folio folio">${esc(s.folio)}</span>
+        <span class="quien"><span class="nom-col">${esc(s.nombre_completo)}</span><span class="empresa">${esc(s.empresa || 'Empresa sin nombre')}</span></span>
+        <span class="monto num">${mxn(s.monto_financiado)}</span>
+        <span class="detalle">${esc(s.producto)}</span>
+        <span class="lado num">${s.numero_pagos} pagos ${PERIODO[s.periodicidad] || esc(s.periodicidad)}</span>
+        <span class="marcas">
+          <span class="folio num" data-movil>${esc(s.folio)}</span>
+          <span class="estado e-${esc(s.estado)}">${NOMBRE_ESTADO[s.estado] || esc(s.estado)}</span>
+          ${s.es_prueba ? '<span class="marca-prueba">Prueba</span>' : ''}
+          ${enCobro ? `<span class="marca-saldo num">Saldo ${mxn(s.saldo)}</span>` : ''}
+          ${vencidas > 0 ? `<span class="marca-atraso">${vencidas} ${vencidas === 1 ? 'cuota vencida' : 'cuotas vencidas'}</span>` : ''}
+          <span class="marca-saldo" data-movil>${hace(s.fecha_solicitud)}</span>
+        </span>
+      </a>`;
+    }).join('');
+}
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+(async function iniciar() {
+  const { data } = await db.auth.getSession();
+  if (data && data.session) await entrar();
+  else mostrarAcceso();
+})();
+
+// Si la sesión se cierra en otra pestaña o expira, regresa al acceso
+db.auth.onAuthStateChange((evento) => {
+  if (evento === 'SIGNED_OUT' && !$('#vistaApp').hidden) {
+    mostrarAcceso('La sesión se cerró.', 'info');
+  }
+});
+</script>
+</body>
+</html>
