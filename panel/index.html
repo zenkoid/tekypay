@@ -352,10 +352,60 @@ dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
 .btn-mini{border:1.5px solid #E5A3A3;background:var(--blanco);color:var(--rojo);border-radius:6px;padding:3px 8px;font-size:12.5px;font-weight:700}
 .btn-mini:hover{background:var(--rojo-suave)}
 
-/* ── PANTALLAS EN CONSTRUCCIÓN ─────────────────────────── */
-.proximo{background:var(--blanco);border:1px dashed var(--linea);border-radius:var(--radio);padding:32px 22px;max-width:560px}
-.proximo h2{font-size:20px;font-weight:800;margin-bottom:6px}
-.proximo p{color:var(--gris);margin-bottom:6px}
+/* ── CARTERA ───────────────────────────────────────────── */
+.antig{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0 0}
+.antig button{border:1.5px solid var(--linea);background:var(--blanco);border-radius:var(--radio);padding:10px 8px;text-align:left;min-width:0}
+.antig button:hover{border-color:var(--azul)}
+.antig button[aria-pressed="true"]{border-color:var(--azul);box-shadow:inset 0 0 0 1px var(--azul);background:var(--azul-suave)}
+.antig .t{display:block;font-size:12px;font-weight:700;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.antig .n{display:block;font-size:20px;font-weight:800;line-height:1.2}
+.antig .m{display:block;font-size:12px;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.antig .b1 .n{color:var(--verde-osc)} .antig .b2 .n{color:var(--ambar)} .antig .b3 .n{color:#D0661B}
+.antig .b4 .n,.antig .b5 .n{color:var(--rojo)}
+@media (max-width:599px){
+  .antig{grid-template-columns:repeat(5,112px);overflow-x:auto;margin-left:-16px;margin-right:-16px;padding:0 16px 4px;scrollbar-width:none}
+  .antig::-webkit-scrollbar{display:none}
+}
+.cartera-filtros{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0 10px}
+.cartera-filtros h2{font-size:18px;font-weight:800;margin-right:auto}
+.cartera-filtros select{padding:10px 12px;border:1.5px solid var(--linea);border-radius:var(--radio);font:inherit;font-size:15px;background:var(--blanco);max-width:100%}
+.cartera-filtros .buscar{flex:1 1 100%}
+@media (min-width:900px){.cartera-filtros .buscar{flex:0 1 300px}}
+.cr{display:grid;grid-template-columns:1fr auto;gap:3px 12px;padding:13px 14px;border-top:1px solid var(--linea);text-decoration:none;color:inherit}
+.cr:first-child{border-top:none}
+.cr:hover{background:#F8FAFD}
+.cr-quien{min-width:0}
+.cr-nombre{display:block;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr-der{display:flex;flex-direction:column;align-items:flex-end}
+.cr-saldo{font-weight:800;text-align:right}
+.cr-sub{display:block;font-size:13px;color:var(--gris);min-width:0}
+.cr-sub span + span::before{content:"";display:inline-block;width:6px}
+.cr-venc{font-size:13px;text-align:right;white-space:nowrap}
+.cr-venc.rojo{color:var(--rojo);font-weight:800}
+.cr-venc.ok{color:var(--verde-osc);font-weight:700}
+.avance{grid-column:1 / -1;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gris);margin-top:3px}
+.avance .pista{flex:1;height:6px;border-radius:4px;background:#EEF1F6;overflow:hidden;max-width:260px}
+.avance .pista i{display:block;height:100%;background:var(--verde)}
+.cr-enc{display:none}
+@media (min-width:900px){
+  .cr,.cr-enc{grid-template-columns:minmax(0,1.4fr) 150px 120px 110px 120px 120px;align-items:center;gap:0 14px;padding:12px 18px}
+  .cr-enc{display:grid;font-size:12.5px;font-weight:700;color:var(--gris);background:#F8FAFD;border-bottom:1px solid var(--linea)}
+  .cr-enc span:nth-child(n+3){text-align:right}
+  .cr .avance{grid-column:auto;margin:0}
+  .cr .avance .pista{max-width:none}
+  .cr-col{text-align:right;font-size:14px}
+}
+.cr-col{display:none}
+@media (min-width:900px){.cr-col{display:block}.cr .solo-movil{display:none}}
+.por-empresa{margin-top:22px}
+.por-empresa h2{font-size:16px;font-weight:800;margin-bottom:8px}
+table.emp{width:100%;border-collapse:collapse;font-size:14px;background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;min-width:480px}
+table.emp th{text-align:left;font-size:12.5px;color:var(--gris);padding:9px 12px;background:#F8FAFD;border-bottom:1px solid var(--linea)}
+table.emp td{padding:9px 12px;border-bottom:1px solid #EEF1F6}
+table.emp tr:last-child td{border-bottom:none}
+table.emp .der{text-align:right}
+table.emp tr.total td{font-weight:800;background:#F8FAFD}
+
 .volver{display:inline-block;margin-bottom:14px;color:var(--azul);font-weight:700;text-decoration:none}
 
 /* ── AVISO FLOTANTE ─────────────────────────────────────── */
@@ -443,7 +493,7 @@ dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
    tabla: todo pasa por funciones de la base que exigen una
    sesión de operador activo.
    ============================================================ */
-const PANEL_VERSION = 'panel v1.3 — módulo 4';
+const PANEL_VERSION = 'panel v1.4 — módulo 5';
 const SUPABASE_URL  = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
 const MINUTOS_INACTIVIDAD = 30;
@@ -685,8 +735,7 @@ function enrutar() {
   switch (seccion) {
     case 'solicitud': return vistaFicha(param);
     case 'corte':     return vistaCorte();
-    case 'cartera':   return vistaPendiente('Cartera',
-      'Aquí verás el saldo de cada crédito, los atrasos y el próximo cobro.');
+    case 'cartera':   return vistaCartera();
     default:          return vistaSolicitudes();
   }
 }
@@ -708,13 +757,6 @@ window.addEventListener('beforeunload', (e) => {
   if (corte.marcas.size) { e.preventDefault(); e.returnValue = ''; }
 });
 
-function vistaPendiente(titulo, texto) {
-  $('#contenido').innerHTML =
-    '<div class="proximo"><h2>' + esc(titulo) + '</h2>' +
-    '<p>' + esc(texto) + '</p>' +
-    '<p>Esta sección se incorpora en un siguiente módulo del panel.</p></div>' +
-    '<p class="version">' + PANEL_VERSION + '</p>';
-}
 
 
 /* ============================================================
@@ -1331,6 +1373,7 @@ function vistaCorte() {
         Mostrar datos de prueba
       </label>
     </div>
+    <p class="nota" style="margin:-4px 0 4px">¿Guardaste un cobro por error? Toca el nombre del colaborador para abrir su ficha y usa <b>Revertir</b> en la tabla “Cobros registrados”.</p>
     <div id="corteLista"><div class="cuotas-lista"><div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div></div></div>
     <div class="guardar-barra" id="barraGuardar" hidden></div>
     <p class="version">${PANEL_VERSION}</p>`;
@@ -1594,6 +1637,227 @@ function confirmarCorte() {
     }
   });
   dlg.showModal();
+}
+
+
+/* ============================================================
+   VISTA: CARTERA (módulo 5)
+   Saldo de cada crédito, atrasos por antigüedad y resumen por
+   empresa. Los datos se leen una vez y se filtran en pantalla.
+   ============================================================ */
+const cartera = {
+  filas: [],
+  incluirLiquidadas: false,
+  tramo: null,        // tramo de antigüedad elegido
+  empresa: '',
+  buscar: '',
+  turno: 0,
+};
+const TRAMOS = [
+  { id: 'b1', nombre: 'Al corriente', prueba: f => !(f.cuotas_vencidas > 0) },
+  { id: 'b2', nombre: '1 a 15 días',  prueba: f => f.cuotas_vencidas > 0 && f.dias_atraso <= 15 },
+  { id: 'b3', nombre: '16 a 30 días', prueba: f => f.cuotas_vencidas > 0 && f.dias_atraso >= 16 && f.dias_atraso <= 30 },
+  { id: 'b4', nombre: '31 a 60 días', prueba: f => f.cuotas_vencidas > 0 && f.dias_atraso >= 31 && f.dias_atraso <= 60 },
+  { id: 'b5', nombre: 'Más de 60',    prueba: f => f.cuotas_vencidas > 0 && f.dias_atraso > 60 },
+];
+
+function vistaCartera() {
+  $('#contenido').innerHTML = `
+    <div class="cifras" id="carteraCifras">
+      <div class="cifra"><span class="v">–</span><span class="l">Saldo en cobranza</span></div>
+      <div class="cifra"><span class="v">–</span><span class="l">Monto vencido</span></div>
+      <div class="cifra"><span class="v">–</span><span class="l">Créditos con atraso</span></div>
+    </div>
+    <div class="antig" id="antig" role="group" aria-label="Créditos por antigüedad del atraso"></div>
+    <p class="nota">Una cuota está vencida cuando su fecha ya pasó y no tiene cobro registrado. Registra cada corte para que esta vista refleje lo que Quentli cobró.</p>
+
+    <div class="cartera-filtros">
+      <h2 id="carteraTitulo">Créditos</h2>
+      <button class="btn btn-texto btn-chico" type="button" id="btnCsv">Descargar CSV</button>
+      <div class="buscar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="carteraBuscar" placeholder="Buscar por folio, nombre o referencia" aria-label="Buscar en la cartera" value="${esc(cartera.buscar)}" autocomplete="off">
+      </div>
+      <select id="carteraEmpresa" aria-label="Filtrar por empresa"><option value="">Todas las empresas</option></select>
+      <label class="interruptor"><input type="checkbox" id="chkLiquidadas" ${cartera.incluirLiquidadas ? 'checked' : ''}>Incluir liquidados</label>
+      <label class="interruptor"><input type="checkbox" id="chkPruebaCartera" ${estado.incluirPrueba ? 'checked' : ''}>Mostrar datos de prueba</label>
+    </div>
+    <p class="meta-lista" id="carteraMeta"></p>
+    <div class="lista" id="carteraLista"><div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div></div>
+
+    <section class="por-empresa" id="porEmpresa" hidden></section>
+    <p class="version">${PANEL_VERSION}</p>`;
+
+  $('#chkLiquidadas').addEventListener('change', e => { cartera.incluirLiquidadas = e.target.checked; cargarCartera(); });
+  $('#chkPruebaCartera').addEventListener('change', e => {
+    estado.incluirPrueba = e.target.checked;
+    $('#franjaPrueba').hidden = !estado.incluirPrueba;
+    cargarCartera();
+  });
+  $('#carteraEmpresa').addEventListener('change', e => { cartera.empresa = e.target.value; pintarCartera(); });
+  let t;
+  $('#carteraBuscar').addEventListener('input', e => {
+    clearTimeout(t);
+    t = setTimeout(() => { cartera.buscar = e.target.value.trim(); pintarCartera(); }, 200);
+  });
+  $('#btnCsv').addEventListener('click', descargarCsv);
+  cargarCartera();
+}
+
+async function cargarCartera() {
+  const turno = ++cartera.turno;
+  const lista = $('#carteraLista');
+  if (lista) lista.innerHTML = '<div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div>';
+  try {
+    const datos = await rpc('fn_panel_saldos', {
+      p_solo_atrasados: false,
+      p_incluir_liquidadas: cartera.incluirLiquidadas,
+      p_incluir_prueba: estado.incluirPrueba,
+    });
+    if (turno !== cartera.turno || !$('#carteraLista')) return;
+    cartera.filas = (datos || []).map(f => Object.assign(f, {
+      cuotas_vencidas: Number(f.cuotas_vencidas) || 0,
+      cuotas_cubiertas: Number(f.cuotas_cubiertas) || 0,
+      dias_atraso: f.dias_atraso == null ? null : Number(f.dias_atraso),
+    }));
+    // Opciones de empresa según lo cargado
+    const empresas = [...new Set(cartera.filas.map(f => f.empresa || 'Empresa sin nombre'))].sort((a, b) => a.localeCompare(b, 'es'));
+    if (cartera.empresa && !empresas.includes(cartera.empresa)) cartera.empresa = '';
+    $('#carteraEmpresa').innerHTML = '<option value="">Todas las empresas</option>' +
+      empresas.map(e => `<option ${e === cartera.empresa ? 'selected' : ''}>${esc(e)}</option>`).join('');
+    pintarCartera();
+  } catch (e) {
+    if (e.message === 'Sesión no válida' || !$('#carteraLista')) return;
+    $('#carteraLista').innerHTML = `<div class="vacio"><strong>No se pudo cargar la cartera</strong>${esc(e.message)}</div>`;
+  }
+}
+
+function filasCartera(conTramo) {
+  const b = cartera.buscar.toLowerCase();
+  const tramo = TRAMOS.find(x => x.id === cartera.tramo);
+  return cartera.filas.filter(f =>
+    (!cartera.empresa || (f.empresa || 'Empresa sin nombre') === cartera.empresa) &&
+    (!b || [f.folio, f.nombre_completo, f.referencia_quentli].some(v => String(v || '').toLowerCase().includes(b))) &&
+    (!conTramo || !tramo || (f.estado !== 'liquidada' && tramo.prueba(f))));
+}
+
+function pintarCartera() {
+  const lista = $('#carteraLista');
+  if (!lista) return;
+  const base = filasCartera(false);
+  const enCobro = base.filter(f => f.estado !== 'liquidada');
+
+  // Cifras (respetan empresa y búsqueda)
+  const saldo = enCobro.reduce((a, f) => a + Number(f.saldo), 0);
+  const vencido = enCobro.reduce((a, f) => a + Number(f.monto_vencido), 0);
+  const conAtraso = enCobro.filter(f => f.cuotas_vencidas > 0).length;
+  $('#carteraCifras').innerHTML = `
+    <div class="cifra"><span class="v num">${mxnCorto(saldo)}</span><span class="l">Saldo en cobranza</span></div>
+    <div class="cifra ${vencido > 0 ? 'alerta' : ''}"><span class="v num">${mxnCorto(vencido)}</span><span class="l">Monto vencido${saldo > 0 ? ' (' + (vencido / saldo * 100).toFixed(1) + '%)' : ''}</span></div>
+    <div class="cifra ${conAtraso ? 'alerta' : ''}"><span class="v num">${conAtraso} de ${enCobro.length}</span><span class="l">Créditos con atraso</span></div>`;
+
+  // Tramos de antigüedad
+  $('#antig').innerHTML = TRAMOS.map(t => {
+    const fs = enCobro.filter(t.prueba);
+    const monto = t.id === 'b1' ? fs.reduce((a, f) => a + Number(f.saldo), 0) : fs.reduce((a, f) => a + Number(f.monto_vencido), 0);
+    return `<button type="button" class="${t.id}" data-tramo="${t.id}" aria-pressed="${cartera.tramo === t.id}">
+      <span class="t">${t.nombre}</span><span class="n num">${fs.length}</span>
+      <span class="m num">${t.id === 'b1' ? 'saldo ' : 'vencido '}${mxnCorto(monto)}</span></button>`;
+  }).join('');
+  document.querySelectorAll('#antig [data-tramo]').forEach(bt => bt.addEventListener('click', () => {
+    cartera.tramo = cartera.tramo === bt.dataset.tramo ? null : bt.dataset.tramo;
+    pintarCartera();
+  }));
+
+  // Lista
+  const filas = filasCartera(true);
+  const tramo = TRAMOS.find(x => x.id === cartera.tramo);
+  $('#carteraTitulo').textContent = tramo ? (tramo.id === 'b1' ? 'Créditos al corriente' : 'Atraso de ' + tramo.nombre.toLowerCase()) : 'Créditos';
+  $('#carteraMeta').textContent = filas.length
+    ? filas.length + (filas.length === 1 ? ' crédito' : ' créditos') + (tramo ? '. Toca el tramo otra vez para ver todos.' : '')
+    : '';
+
+  if (!filas.length) {
+    lista.innerHTML = `<div class="vacio"><strong>${cartera.filas.length ? 'Ningún crédito coincide con el filtro' : 'Aún no hay créditos en cobranza'}</strong>
+      ${cartera.filas.length ? '' : 'Aquí aparecen los créditos formalizados y activos.'}${estado.incluirPrueba ? '' : '<br><br>Los datos de prueba están ocultos.'}</div>`;
+  } else {
+    lista.innerHTML = `<div class="cr-enc"><span>Crédito</span><span>Avance</span><span>Saldo</span><span>Vencido</span><span>Atraso</span><span>Próximo cobro</span></div>` +
+      filas.map(f => {
+        const n = Number(f.numero_pagos) || 0;
+        const pct = n ? Math.round(f.cuotas_cubiertas / n * 100) : 0;
+        const atraso = f.cuotas_vencidas > 0;
+        const txtAtraso = f.estado === 'liquidada' ? 'Liquidado' : atraso ? f.dias_atraso + (f.dias_atraso === 1 ? ' día' : ' días') : 'Al corriente';
+        return `
+        <a class="cr" href="#solicitud/${esc(f.solicitud_id)}">
+          <span class="cr-quien">
+            <span class="cr-nombre">${esc(f.nombre_completo)}</span>
+            <span class="cr-sub"><span class="folio">${esc(f.folio)}</span><span>${esc(f.empresa || '')}</span>${f.referencia_quentli ? `<span>Quentli ${esc(f.referencia_quentli)}</span>` : ''}${f.es_prueba ? ' <span class="marca-prueba">Prueba</span>' : ''}${f.estado !== 'activa' ? ` <span class="estado e-${esc(f.estado)}">${NOMBRE_ESTADO[f.estado] || esc(f.estado)}</span>` : ''}</span>
+          </span>
+          <span class="cr-der solo-movil">
+            <span class="cr-saldo num">${mxn(f.saldo)}</span>
+            <span class="cr-venc ${atraso ? 'rojo' : 'ok'}">${atraso ? mxn(f.monto_vencido) + ' vencido' : txtAtraso}</span>
+          </span>
+          <span class="avance"><span class="pista"><i style="width:${pct}%"></i></span><span class="num">${f.cuotas_cubiertas} de ${n}</span>
+            ${atraso ? `<span class="solo-movil" style="color:var(--rojo);font-weight:700">${txtAtraso}</span>` : ''}
+            ${f.proximo_cobro ? `<span class="solo-movil">Próximo ${fechaCorta(f.proximo_cobro)}</span>` : ''}</span>
+          <span class="cr-col num" style="font-weight:800">${mxn(f.saldo)}</span>
+          <span class="cr-col num ${atraso ? 'cr-venc rojo' : ''}">${atraso ? mxn(f.monto_vencido) : '–'}</span>
+          <span class="cr-col ${atraso ? 'cr-venc rojo' : 'cr-venc ok'}">${txtAtraso}</span>
+          <span class="cr-col">${f.proximo_cobro ? fechaCorta(f.proximo_cobro) : '–'}</span>
+        </a>`;
+      }).join('');
+  }
+
+  // Resumen por empresa (sólo créditos en cobranza, respeta la búsqueda)
+  const sec = $('#porEmpresa');
+  const porEmp = {};
+  enCobro.forEach(f => {
+    const k = f.empresa || 'Empresa sin nombre';
+    const e = porEmp[k] || (porEmp[k] = { creditos: 0, saldo: 0, vencido: 0, atraso: 0 });
+    e.creditos++; e.saldo += Number(f.saldo); e.vencido += Number(f.monto_vencido);
+    if (f.cuotas_vencidas > 0) e.atraso++;
+  });
+  const claves = Object.keys(porEmp).sort((a, b) => porEmp[b].saldo - porEmp[a].saldo);
+  if (claves.length > 1 || (claves.length === 1 && !cartera.empresa)) {
+    sec.hidden = false;
+    sec.innerHTML = `<h2>Por empresa</h2><div class="tabla-scroll"><table class="emp">
+      <thead><tr><th>Empresa</th><th class="der">Créditos</th><th class="der">Con atraso</th><th class="der">Saldo</th><th class="der">Vencido</th></tr></thead>
+      <tbody>${claves.map(k => `<tr><td>${esc(k)}</td><td class="der num">${porEmp[k].creditos}</td><td class="der num">${porEmp[k].atraso}</td>
+        <td class="der num">${mxn(porEmp[k].saldo)}</td><td class="der num">${mxn(porEmp[k].vencido)}</td></tr>`).join('')}
+      <tr class="total"><td>Total</td><td class="der num">${enCobro.length}</td><td class="der num">${conAtraso}</td><td class="der num">${mxn(saldo)}</td><td class="der num">${mxn(vencido)}</td></tr>
+      </tbody></table></div>`;
+  } else {
+    sec.hidden = true;
+  }
+}
+
+function descargarCsv() {
+  const filas = filasCartera(true);
+  if (!filas.length) { aviso('No hay créditos que descargar con este filtro.'); return; }
+  const col = [
+    ['Folio', f => f.folio], ['Colaborador', f => f.nombre_completo], ['Empresa', f => f.empresa],
+    ['Referencia Quentli', f => f.referencia_quentli], ['Estado', f => NOMBRE_ESTADO[f.estado] || f.estado],
+    ['Primer cobro', f => f.fecha_primer_cobro], ['Cuotas', f => f.numero_pagos], ['Cuotas cubiertas', f => f.cuotas_cubiertas],
+    ['Cuotas vencidas', f => f.cuotas_vencidas], ['Total de cobros', f => f.total_cobros], ['Cobrado', f => f.cobrado],
+    ['Saldo', f => f.saldo], ['Monto vencido', f => f.monto_vencido], ['Días de atraso', f => f.dias_atraso ?? ''],
+    ['Próximo cobro', f => f.proximo_cobro], ['Prueba', f => f.es_prueba ? 'Sí' : 'No'],
+  ];
+  const celda = v => {
+    let t = String(v ?? '');
+    if (/^[=+\-@]/.test(t) && isNaN(Number(t))) t = "'" + t;      // evita fórmulas al abrir en Excel
+    return /[",\n;]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+  };
+  const csv = '\uFEFF' + [col.map(c => c[0]), ...filas.map(f => col.map(c => c[1](f)))]
+    .map(r => r.map(celda).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tekypay_cartera_' + hoyMX() + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  aviso('Se descargaron ' + filas.length + (filas.length === 1 ? ' crédito.' : ' créditos.'));
 }
 
 /* ============================================================
