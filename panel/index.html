@@ -192,6 +192,97 @@ main{max-width:1120px;margin:0 auto;padding:16px 16px 96px}
 .esqueleto:first-child{border-top:none}
 @keyframes brillo{to{background-position:-200% 0}}
 
+/* ── FICHA DE SOLICITUD ────────────────────────────────── */
+.ficha-enc{margin-bottom:14px}
+.ficha-enc .fila-sup{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px}
+.ficha-enc .folio-grande{font-size:24px;font-weight:800;color:var(--azul);letter-spacing:-.01em}
+.ficha-enc h1{font-size:20px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+.ficha-enc .sub{color:var(--gris);font-size:14px}
+.acciones{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.btn-aprobar{background:var(--verde-osc);color:#fff}
+.btn-aprobar:hover{background:#4E7100}
+.btn-rechazar{background:var(--blanco);color:var(--rojo);border:1.5px solid #E5A3A3}
+.btn-rechazar:hover{background:var(--rojo-suave)}
+.btn-neutro{background:var(--blanco);color:var(--gris);border:1.5px solid var(--linea)}
+.btn-neutro:hover{background:#F8FAFD}
+.siguiente{font-size:14px;color:var(--gris);margin:6px 0 0}
+.cierre{border-radius:var(--radio);padding:12px 14px;margin:12px 0 0;font-size:14px}
+.cierre.rechazo{background:var(--rojo-suave);color:#8E1519}
+.cierre.cancelacion{background:#F3ECEC;color:#6E4646}
+.cierre.liquidacion{background:#ECEFF3;color:var(--gris)}
+
+.rejilla{display:grid;gap:14px}
+@media (min-width:900px){.rejilla{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
+.bloque{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);padding:16px}
+.bloque h2{font-size:15px;font-weight:800;margin-bottom:10px}
+.bloque.destacado{border-color:#B9CFF3;box-shadow:inset 4px 0 0 var(--azul)}
+.dato{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid #EEF1F6;font-size:14px}
+.dato:first-of-type{border-top:none}
+.dato .k{color:var(--gris)}
+.dato .v{font-weight:700;text-align:right;overflow-wrap:anywhere}
+.dato.total .v{color:var(--azul)}
+.dato.alerta .v{color:var(--rojo)}
+.nota{font-size:12.5px;color:var(--gris);margin-top:8px}
+
+.medidor{margin:4px 0 12px}
+.medidor .cifra-grande{font-size:28px;font-weight:800;line-height:1.1}
+.medidor .cifra-grande small{font-size:14px;font-weight:700;color:var(--gris)}
+.barra-cap{position:relative;height:10px;border-radius:6px;background:#EEF1F6;margin:10px 0 4px;overflow:visible}
+.barra-cap .relleno{height:100%;border-radius:6px;background:var(--verde)}
+.barra-cap .tope{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--tinta)}
+.barra-cap-pie{display:flex;justify-content:space-between;font-size:12px;color:var(--gris)}
+.nivel-ok .cifra-grande{color:var(--verde-osc)}
+.nivel-cerca .cifra-grande{color:var(--ambar)} .nivel-cerca .relleno{background:#E09A2B}
+.nivel-excede .cifra-grande{color:var(--rojo)} .nivel-excede .relleno{background:var(--rojo)}
+
+.alerta-caja{background:var(--ambar-suave);color:#7A4A00;border-radius:8px;padding:9px 11px;font-size:13.5px;margin-bottom:10px}
+.mini-lista a{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #EEF1F6;text-decoration:none;color:inherit;font-size:14px}
+.mini-lista a:first-child{border-top:none}
+.mini-lista a:hover .folio{text-decoration:underline}
+
+details.plegable summary{cursor:pointer;font-weight:800;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.plegable summary::-webkit-details-marker{display:none}
+details.plegable summary::after{content:"Mostrar";font-size:13px;color:var(--azul);font-weight:700}
+details.plegable[open] summary::after{content:"Ocultar"}
+details.plegable[open] summary{margin-bottom:10px}
+.tabla-scroll{overflow-x:auto}
+table.cuotas{width:100%;border-collapse:collapse;font-size:13.5px;min-width:360px}
+table.cuotas th{text-align:left;color:var(--gris);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--linea)}
+table.cuotas td{padding:7px 8px;border-bottom:1px solid #EEF1F6}
+table.cuotas td.der,table.cuotas th.der{text-align:right}
+.q-cubierta{color:var(--verde-osc);font-weight:700}
+.q-vencida{color:var(--rojo);font-weight:700}
+.q-parcial{color:var(--ambar);font-weight:700}
+.q-pendiente,.q-proyeccion{color:var(--gris)}
+
+.linea-tiempo{list-style:none}
+.linea-tiempo li{position:relative;padding:0 0 14px 20px;font-size:14px}
+.linea-tiempo li::before{content:"";position:absolute;left:4px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--azul)}
+.linea-tiempo li::after{content:"";position:absolute;left:7.5px;top:16px;bottom:0;width:1px;background:var(--linea)}
+.linea-tiempo li:last-child::after{display:none}
+.linea-tiempo .cuando{font-size:12.5px;color:var(--gris)}
+.linea-tiempo .que{font-weight:700}
+.linea-tiempo .por{color:var(--gris);font-size:13px}
+.linea-tiempo .coment{font-size:13.5px;margin-top:2px;overflow-wrap:anywhere}
+
+/* ── DIÁLOGO DE CONFIRMACIÓN ───────────────────────────── */
+dialog.dlg{border:none;border-radius:14px;padding:0;width:min(460px,calc(100% - 24px));box-shadow:0 24px 60px rgba(0,0,0,.3)}
+dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
+.dlg form{padding:20px}
+.dlg h2{font-size:19px;font-weight:800;margin-bottom:6px}
+.dlg .resumen{background:var(--fondo);border-radius:8px;padding:10px 12px;margin:10px 0 12px;font-size:14px}
+.dlg .resumen div{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+.dlg .resumen span:first-child{color:var(--gris)}
+.dlg .resumen span:last-child{font-weight:700;text-align:right}
+.dlg label{display:block;font-size:13px;font-weight:700;margin:8px 0 6px}
+.dlg textarea{width:100%;min-height:78px;padding:10px 12px;border:1.5px solid var(--linea);border-radius:var(--radio);font:inherit;font-size:16px;resize:vertical}
+.dlg textarea:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,71,186,.12)}
+.dlg .rapidos{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.dlg .rapidos button{border:1.5px solid var(--linea);background:var(--blanco);border-radius:999px;padding:4px 10px;font-size:13px;color:var(--gris);font-weight:700}
+.dlg .rapidos button:hover{border-color:var(--azul);color:var(--azul)}
+.dlg .pie{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.dlg .err{color:var(--rojo);font-size:13.5px;margin-top:6px}
+
 /* ── PANTALLAS EN CONSTRUCCIÓN ─────────────────────────── */
 .proximo{background:var(--blanco);border:1px dashed var(--linea);border-radius:var(--radio);padding:32px 22px;max-width:560px}
 .proximo h2{font-size:20px;font-weight:800;margin-bottom:6px}
@@ -272,6 +363,7 @@ main{max-width:1120px;margin:0 auto;padding:16px 16px 96px}
 </div>
 
 <div class="toast" id="toast" role="status" hidden></div>
+<dialog class="dlg" id="dlg" aria-labelledby="dlgTitulo"></dialog>
 
 <!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -282,7 +374,7 @@ main{max-width:1120px;margin:0 auto;padding:16px 16px 96px}
    tabla: todo pasa por funciones de la base que exigen una
    sesión de operador activo.
    ============================================================ */
-const PANEL_VERSION = 'panel v1.0 — módulo 1';
+const PANEL_VERSION = 'panel v1.1 — módulo 2';
 const SUPABASE_URL  = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
 const MINUTOS_INACTIVIDAD = 30;
@@ -332,7 +424,7 @@ function esc(v) {
 }
 function mxn(n) {
   const v = Number(n) || 0;
-  return '$' + v.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function mxnCorto(n) {
   const v = Number(n) || 0;
@@ -473,6 +565,7 @@ async function entrar() {
 
 async function cerrarSesion(mensaje) {
   clearTimeout(inactividadTimer);
+  const dlg = $('#dlg'); if (dlg.open) dlg.close();
   estado.operador = null;
   estado.bandeja = [];
   estado.resumen = null;
@@ -520,7 +613,7 @@ function enrutar() {
   window.scrollTo(0, 0);
 
   switch (seccion) {
-    case 'solicitud': return vistaFichaPendiente(param);
+    case 'solicitud': return vistaFicha(param);
     case 'corte':     return vistaPendiente('Corte de cobros',
       'Aquí registrarás, después de cada nómina, qué cobros aplicó Quentli y cuáles no.');
     case 'cartera':   return vistaPendiente('Cartera',
@@ -538,13 +631,349 @@ function vistaPendiente(titulo, texto) {
     '<p class="version">' + PANEL_VERSION + '</p>';
 }
 
-function vistaFichaPendiente(id) {
-  const s = estado.bandeja.find(x => x.solicitud_id === id);
-  $('#contenido').innerHTML =
-    '<a class="volver" href="#solicitudes">Volver a solicitudes</a>' +
-    '<div class="proximo"><h2>' + (s ? 'Solicitud ' + esc(s.folio) : 'Solicitud') + '</h2>' +
-    (s ? '<p>' + esc(s.nombre_completo) + ' solicita ' + esc(s.producto) + '.</p>' : '') +
-    '<p>La ficha completa, con la aprobación y el rechazo, llega en el módulo 2.</p></div>';
+
+/* ============================================================
+   VISTA: FICHA DE LA SOLICITUD (módulo 2)
+   ============================================================ */
+
+// El scoring guarda en antiguedad_meses los PUNTOS del rango
+// elegido, no los meses. Se traducen aquí a su rango.
+const ANTIGUEDAD = { 3: 'Menos de 6 meses', 15: '6 a 12 meses', 25: '1 a 2 años', 35: '2 a 5 años', 45: 'Más de 5 años' };
+const COBROS_AL_MES = { semanal: 4, quincenal: 2, mensual: 1 };   // mismo criterio que el simulador
+const LIMITE_INGRESO = 0.30;
+const VIGENTES = ['solicitada', 'aprobada', 'formalizada', 'activa'];
+const NOMBRE_EVENTO = {
+  aprobada: 'Aprobada', rechazada: 'Rechazada', formalizada: 'Formalizada',
+  activa: 'Producto entregado', liquidada: 'Liquidada', cancelada: 'Cancelada'
+};
+
+let fichaActual = null;
+
+function dato(k, v, clase) {
+  return `<div class="dato ${clase || ''}"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+}
+function fechaHora(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('es-MX', { day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', timeZone: 'America/Mexico_City' });
+}
+function fechaCorta(yyyy_mm_dd) {
+  if (!yyyy_mm_dd) return '';
+  const [y, m, d] = String(yyyy_mm_dd).slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+async function vistaFicha(id) {
+  const cont = $('#contenido');
+  cont.innerHTML = `<a class="volver" href="#solicitudes">Volver a solicitudes</a>
+    <div class="lista"><div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div></div>`;
+  try {
+    fichaActual = await rpc('fn_panel_ficha', { p_solicitud_id: id });
+  } catch (e) {
+    if (e.message === 'Sesión no válida') return;
+    cont.innerHTML = `<a class="volver" href="#solicitudes">Volver a solicitudes</a>
+      <div class="vacio lista"><strong>No se pudo abrir la solicitud</strong>${esc(e.message)}</div>`;
+    return;
+  }
+  if (location.hash !== '#solicitud/' + id) return;   // el operador ya navegó a otra parte
+  pintarFicha();
+}
+
+function pintarFicha() {
+  const f = fichaActual;
+  const s = f.solicitud, c = f.colaborador, emp = f.empresa || {};
+  const cuotas = f.cuotas || [], eventos = f.eventos || [], cobros = f.cobros || [], otras = f.otras_solicitudes || [];
+
+  // ── Capacidad de pago ──
+  const factor   = COBROS_AL_MES[s.periodicidad] || 1;
+  const pagoMes  = Number(s.pago_periodico) * factor;
+  const ingreso  = Number(c.ingreso_mensual_neto) || 0;
+  const gastos   = Number(c.gastos_mensuales) || 0;
+  const pct      = ingreso > 0 ? pagoMes / ingreso : null;
+  const libre    = ingreso - gastos;
+  const pctLibre = libre > 0 ? pagoMes / libre : null;
+  const alertaLibre = libre <= 0 || pctLibre > LIMITE_INGRESO;
+  const nivelCap = pct === null ? '' : pct > LIMITE_INGRESO ? 'nivel-excede' : pct > 0.22 ? 'nivel-cerca' : 'nivel-ok';
+  const escala   = 0.5;   // la barra llega a 50% del ingreso
+  const anchoBarra = pct === null ? 0 : Math.min(pct / escala, 1) * 100;
+  const leyendaCap = pct === null ? 'Sin ingreso registrado: no se puede calcular.'
+    : pct > LIMITE_INGRESO ? 'Rebasa el límite del 30% del ingreso neto.'
+    : pct > 0.22 ? 'Dentro del límite, cerca del 30%.'
+    : 'Dentro del límite del 30% del ingreso neto.';
+
+  // ── Otras solicitudes vigentes (Regla 4) ──
+  const otrasVigentes = otras.filter(o => VIGENTES.includes(o.estado));
+
+  // ── Acciones según estado ──
+  let acciones = '', siguiente = '';
+  if (s.estado === 'solicitada') {
+    acciones = `
+      <button class="btn btn-aprobar" type="button" data-accion="aprobar">Aprobar</button>
+      <button class="btn btn-rechazar" type="button" data-accion="rechazar">Rechazar</button>
+      <button class="btn btn-neutro" type="button" data-accion="cancelar">Cancelar solicitud</button>`;
+  } else if (s.estado === 'aprobada') {
+    acciones = `<button class="btn btn-neutro" type="button" data-accion="cancelar">Cancelar solicitud</button>`;
+    siguiente = 'Siguiente paso: formalizar, con el enganche confirmado y la referencia de Quentli. Se habilita en el módulo 3.';
+  } else if (s.estado === 'formalizada') {
+    siguiente = 'Siguiente paso: registrar la entrega del producto. Se habilita en el módulo 3.';
+  }
+
+  let cierre = '';
+  if (s.estado === 'rechazada')  cierre = `<div class="cierre rechazo"><strong>Rechazada.</strong> ${esc(s.motivo_rechazo)}</div>`;
+  if (s.estado === 'cancelada')  cierre = `<div class="cierre cancelacion"><strong>Cancelada.</strong> ${esc(s.motivo_cancelacion)}</div>`;
+  if (s.estado === 'liquidada')  cierre = `<div class="cierre liquidacion"><strong>Liquidada</strong> el ${fecha(s.cerrada_en)}.</div>`;
+
+  const totalCobros = Number(s.pago_periodico) * Number(s.numero_pagos);
+  const esProyeccion = cuotas.length && cuotas.every(q => q.es_proyeccion);
+
+  // ── Historial ──
+  const historial = [
+    { cuando: s.fecha_solicitud, que: 'Solicitud generada', por: 'por el colaborador', coment: '' },
+    ...eventos.map(e => ({ cuando: e.creado_en,
+                           que: e.estado_anterior === 'liquidada' ? 'Reabierta' : (NOMBRE_EVENTO[e.estado_nuevo] || e.estado_nuevo),
+                           por: e.operador ? 'por ' + e.operador : '', coment: e.comentario || '' }))
+  ].reverse();
+
+  $('#contenido').innerHTML = `
+    <a class="volver" href="#solicitudes">Volver a solicitudes</a>
+
+    <div class="ficha-enc">
+      <div class="fila-sup">
+        <span class="folio-grande num">${esc(s.folio)}</span>
+        <span class="estado e-${esc(s.estado)}">${NOMBRE_ESTADO[s.estado] || esc(s.estado)}</span>
+        ${s.es_prueba ? '<span class="marca-prueba">Prueba</span>' : ''}
+      </div>
+      <h1>${esc(c.nombre_completo)}</h1>
+      <div class="sub">${esc(emp.nombre || 'Empresa sin nombre')}. Solicitó ${esc(s.producto)} el ${fecha(s.fecha_solicitud)}.</div>
+      ${acciones ? `<div class="acciones">${acciones}</div>` : ''}
+      ${siguiente ? `<p class="siguiente">${siguiente}</p>` : ''}
+      ${cierre}
+    </div>
+
+    <div class="rejilla">
+      <div class="rejilla" style="grid-template-columns:minmax(0,1fr)">
+
+        <section class="bloque ${s.estado === 'solicitada' ? 'destacado' : ''}">
+          <h2>Capacidad de pago</h2>
+          <div class="medidor ${nivelCap}">
+            <div class="cifra-grande num">${pct === null ? '–' : (pct * 100).toFixed(1) + '%'} <small>del ingreso neto</small></div>
+            <div class="barra-cap" aria-hidden="true">
+              <div class="relleno" style="width:${anchoBarra}%"></div>
+              <div class="tope" style="left:${LIMITE_INGRESO / escala * 100}%"></div>
+            </div>
+            <div class="barra-cap-pie"><span>0%</span><span>Límite 30%</span><span>50%</span></div>
+            <p class="nota">${leyendaCap}</p>
+          </div>
+          ${dato('Pago mensual equivalente', mxn(pagoMes))}
+          ${dato('Ingreso mensual neto', ingreso ? mxn(ingreso) : 'Sin dato')}
+          ${dato('Gastos mensuales declarados', mxn(gastos))}
+          ${dato('Ingreso libre', mxn(libre), libre <= 0 ? 'alerta' : '')}
+          ${dato('Pago sobre ingreso libre', pctLibre === null ? 'Sin ingreso libre' : (pctLibre * 100).toFixed(1) + '%', alertaLibre ? 'alerta' : '')}
+          <p class="nota">Ingreso y gastos son los que declaró el colaborador al calificar.${alertaLibre ? ' Sus gastos dejan poco o ningún margen para el pago.' : ''}</p>
+        </section>
+
+        <section class="bloque">
+          <h2>Línea de crédito</h2>
+          ${dato('Nivel', 'TEKY ' + esc(c.nivel_teky || '–'))}
+          ${dato('Score', esc(c.score_calculado ?? '–'))}
+          ${dato('Línea asignada', mxn(c.linea_credito_asignada))}
+          ${dato('Comprometida', mxn(c.linea_comprometida))}
+          ${dato('Disponible', mxn(c.linea_disponible), 'total')}
+          <p class="nota">Lo comprometido incluye las solicitudes en revisión, esta incluida. Al rechazar o cancelar, su monto vuelve a la línea.</p>
+        </section>
+
+        <section class="bloque">
+          <h2>Otras solicitudes de esta persona</h2>
+          ${otrasVigentes.length ? `<div class="alerta-caja">Tiene ${otrasVigentes.length} ${otrasVigentes.length === 1 ? 'otra solicitud vigente' : 'otras solicitudes vigentes'}. Revisa que no sea un duplicado.</div>` : ''}
+          ${otras.length ? `<div class="mini-lista">${otras.map(o => `
+            <a href="#solicitud/${esc(o.solicitud_id)}">
+              <span><span class="folio">${esc(o.folio)}</span> ${esc(o.producto)}</span>
+              <span class="estado e-${esc(o.estado)}">${NOMBRE_ESTADO[o.estado] || esc(o.estado)}</span>
+            </a>`).join('')}</div>`
+          : '<p class="nota" style="margin:0">Es su única solicitud.</p>'}
+        </section>
+
+        <section class="bloque">
+          <h2>Colaborador</h2>
+          ${dato('CURP', esc(c.curp || 'Sin CURP'))}
+          ${dato('RFC', esc(c.rfc || 'No capturado'))}
+          ${dato('Edad', c.edad ? esc(c.edad) + ' años' : '–')}
+          ${dato('Antigüedad', esc(ANTIGUEDAD[c.antiguedad_meses] || 'Sin dato'))}
+          ${dato('Buró positivo', c.buro_credito ? 'Declaró que sí' : 'No declarado')}
+          ${dato('Empresa', esc(emp.nombre || '–') + (emp.tier ? ' (tier ' + esc(emp.tier) + ')' : ''))}
+          ${dato('Calificó el', fecha(c.created_at))}
+        </section>
+      </div>
+
+      <div class="rejilla" style="grid-template-columns:minmax(0,1fr)">
+        <section class="bloque">
+          <h2>Condiciones</h2>
+          ${dato('Producto', esc(s.producto))}
+          ${dato('Precio de contado', mxn(s.precio_contado))}
+          ${dato('Enganche (' + Math.round(Number(s.enganche_porcentaje)) + '%)', mxn(s.enganche_monto))}
+          ${dato('Monto financiado', mxn(s.monto_financiado))}
+          ${dato('Tasa mensual', (Number(s.tasa_mensual) * 100).toFixed(1) + '%')}
+          ${dato('Plazo', s.numero_pagos + ' pagos ' + (PERIODO[s.periodicidad] || esc(s.periodicidad)))}
+          ${dato('Pago por periodo', mxn(s.pago_periodico))}
+          ${dato('Total de los cobros', mxn(totalCobros))}
+          ${dato('Total con enganche', mxn(totalCobros + Number(s.enganche_monto)), 'total')}
+          ${s.referencia_quentli ? dato('Referencia Quentli', esc(s.referencia_quentli)) : ''}
+          ${s.fecha_primer_cobro ? dato('Primer cobro', fechaCorta(s.fecha_primer_cobro)) : ''}
+          ${s.fecha_entrega ? dato('Entregado el', fechaCorta(s.fecha_entrega)) : ''}
+        </section>
+
+        <section class="bloque">
+          <details class="plegable">
+            <summary>Calendario de cobros</summary>
+            ${esProyeccion ? '<p class="nota" style="margin:0 0 8px">Proyección informativa. Las fechas definitivas se fijan al formalizar.</p>' : ''}
+            <div class="tabla-scroll"><table class="cuotas">
+              <thead><tr><th>#</th><th>Fecha</th><th class="der">Monto</th><th class="der">Cobrado</th><th>Estado</th></tr></thead>
+              <tbody>${cuotas.map(q => `
+                <tr><td class="num">${q.numero_pago}</td><td>${fechaCorta(q.fecha_cobro)}</td>
+                <td class="der num">${mxn(q.monto)}</td><td class="der num">${mxn(q.cobrado)}</td>
+                <td class="q-${esc(q.estatus)}">${{cubierta:'Cubierta',vencida:'Vencida',parcial:'Parcial',pendiente:'Pendiente',proyeccion:'Proyección'}[q.estatus] || esc(q.estatus)}</td></tr>`).join('')}
+              </tbody></table></div>
+          </details>
+        </section>
+
+        ${cobros.length ? `
+        <section class="bloque">
+          <h2>Cobros registrados</h2>
+          <div class="tabla-scroll"><table class="cuotas">
+            <thead><tr><th>Corte</th><th>Cuota</th><th>Resultado</th><th class="der">Monto</th></tr></thead>
+            <tbody>${cobros.map(k => `
+              <tr><td>${fechaCorta(k.fecha_corte)}</td><td class="num">${k.numero_pago}</td>
+              <td>${{cobrado:'Cobrado',no_cobrado:'No cobrado',reverso:'Reverso'}[k.resultado] || esc(k.resultado)}${k.revertido ? ' (revertido)' : ''}</td>
+              <td class="der num">${mxn(k.monto)}</td></tr>`).join('')}
+            </tbody></table></div>
+        </section>` : ''}
+
+        <section class="bloque">
+          <h2>Historial</h2>
+          <ol class="linea-tiempo">${historial.map(h => `
+            <li><div class="cuando">${fechaHora(h.cuando)}</div>
+                <div class="que">${esc(h.que)} <span class="por">${esc(h.por)}</span></div>
+                ${h.coment ? `<div class="coment">${esc(h.coment)}</div>` : ''}</li>`).join('')}
+          </ol>
+        </section>
+      </div>
+    </div>
+    <p class="version">${PANEL_VERSION}</p>
+  `;
+
+  document.querySelectorAll('[data-accion]').forEach(b =>
+    b.addEventListener('click', () => ejecutarAccion(b.dataset.accion)));
+}
+
+/* ── Acciones ─────────────────────────────────────────────── */
+const ACCIONES = {
+  aprobar: {
+    titulo: 'Aprobar solicitud',
+    texto: 'Con la aprobación, el colaborador se convierte en acreditado. El siguiente paso será formalizar con Quentli.',
+    etiqueta: 'Comentario (opcional)', obligatorio: false,
+    boton: 'Aprobar', claseBoton: 'btn-aprobar',
+    funcion: 'fn_panel_aprobar', parametro: 'p_comentario',
+    exito: 'aprobada',
+  },
+  rechazar: {
+    titulo: 'Rechazar solicitud',
+    texto: 'El monto regresa a la línea disponible del colaborador. El motivo queda en el historial.',
+    etiqueta: 'Motivo del rechazo', obligatorio: true,
+    rapidos: ['Capacidad de pago insuficiente', 'Solicitud duplicada', 'RH no confirma la relación laboral', 'Los datos no coinciden con RH'],
+    boton: 'Rechazar', claseBoton: 'btn-rechazar',
+    funcion: 'fn_panel_rechazar', parametro: 'p_motivo',
+    exito: 'rechazada',
+  },
+  cancelar: {
+    titulo: 'Cancelar solicitud',
+    texto: 'Úsalo cuando el trámite no sigue por una razón ajena a la evaluación. El monto regresa a la línea disponible.',
+    etiqueta: 'Motivo de la cancelación', obligatorio: true,
+    rapidos: ['El colaborador desistió', 'Solicitud duplicada', 'Producto sin existencia', 'Baja del colaborador en la empresa'],
+    boton: 'Cancelar solicitud', claseBoton: 'btn-rechazar',
+    funcion: 'fn_panel_cancelar', parametro: 'p_motivo',
+    exito: 'cancelada',
+  },
+};
+
+function ejecutarAccion(tipo) {
+  const cfg = ACCIONES[tipo];
+  const s = fichaActual.solicitud, c = fichaActual.colaborador;
+  const dlg = $('#dlg');
+
+  // Advertencias que el operador debe ver antes de aprobar
+  let advertencias = '';
+  if (tipo === 'aprobar') {
+    const ingreso = Number(c.ingreso_mensual_neto) || 0;
+    const pagoMes = Number(s.pago_periodico) * (COBROS_AL_MES[s.periodicidad] || 1);
+    if (ingreso > 0 && pagoMes / ingreso > LIMITE_INGRESO)
+      advertencias += `<div class="alerta-caja">El pago mensual equivale al ${(pagoMes / ingreso * 100).toFixed(1)}% del ingreso neto, arriba del límite del 30%.</div>`;
+    const libre = ingreso - (Number(c.gastos_mensuales) || 0);
+    if (libre <= 0)
+      advertencias += `<div class="alerta-caja">Los gastos declarados igualan o superan su ingreso neto.</div>`;
+    else if (pagoMes / libre > LIMITE_INGRESO)
+      advertencias += `<div class="alerta-caja">El pago mensual equivale al ${(pagoMes / libre * 100).toFixed(1)}% de su ingreso libre.</div>`;
+    const otras = (fichaActual.otras_solicitudes || []).filter(o => VIGENTES.includes(o.estado));
+    if (otras.length)
+      advertencias += `<div class="alerta-caja">Esta persona tiene ${otras.length} ${otras.length === 1 ? 'otra solicitud vigente' : 'otras solicitudes vigentes'}.</div>`;
+    if (s.es_prueba)
+      advertencias += `<div class="alerta-caja">Es una solicitud de prueba.</div>`;
+  }
+
+  dlg.innerHTML = `
+    <form method="dialog" novalidate>
+      <h2 id="dlgTitulo">${cfg.titulo}</h2>
+      <p class="nota" style="margin:0">${cfg.texto}</p>
+      <div class="resumen">
+        <div><span>Folio</span><span>${esc(s.folio)}</span></div>
+        <div><span>Colaborador</span><span>${esc(c.nombre_completo)}</span></div>
+        <div><span>Producto</span><span>${esc(s.producto)}</span></div>
+        <div><span>Financiado</span><span class="num">${mxn(s.monto_financiado)}</span></div>
+      </div>
+      ${advertencias}
+      <label for="dlgTexto">${cfg.etiqueta}</label>
+      ${cfg.rapidos ? `<div class="rapidos">${cfg.rapidos.map(r => `<button type="button" data-rapido="${esc(r)}">${esc(r)}</button>`).join('')}</div>` : ''}
+      <textarea id="dlgTexto" maxlength="500"></textarea>
+      <div class="err" id="dlgError" hidden></div>
+      <div class="pie">
+        <button class="btn btn-neutro" type="button" id="dlgCerrar">Volver</button>
+        <button class="btn ${cfg.claseBoton}" type="button" id="dlgConfirmar">${cfg.boton}</button>
+      </div>
+    </form>`;
+
+  const txt = $('#dlgTexto', dlg), err = $('#dlgError', dlg), ok = $('#dlgConfirmar', dlg);
+  dlg.querySelectorAll('[data-rapido]').forEach(b => b.addEventListener('click', () => {
+    txt.value = b.dataset.rapido + (txt.value && !txt.value.startsWith(b.dataset.rapido) ? '. ' + txt.value : '');
+    txt.focus();
+  }));
+  $('#dlgCerrar', dlg).addEventListener('click', () => dlg.close());
+
+  ok.addEventListener('click', async () => {
+    const valor = txt.value.trim();
+    if (cfg.obligatorio && valor.length < 5) {
+      err.textContent = 'Escribe el motivo (al menos 5 caracteres) o elige uno de los sugeridos.';
+      err.hidden = false; txt.focus();
+      return;
+    }
+    err.hidden = true;
+    ok.disabled = true;
+    ok.innerHTML = '<span class="giro" aria-hidden="true"></span>Guardando';
+    try {
+      await rpc(cfg.funcion, { p_solicitud_id: s.id, [cfg.parametro]: valor || null });
+      dlg.close();
+      aviso('Solicitud ' + s.folio + ' ' + cfg.exito + '.');
+      estado.resumen = null;          // el tablero se recarga al volver
+      vistaFicha(s.id);
+    } catch (e) {
+      if (e.message === 'Sesión no válida') { dlg.close(); return; }
+      err.textContent = e.message;
+      err.hidden = false;
+      ok.disabled = false;
+      ok.textContent = cfg.boton;
+    }
+  });
+
+  dlg.showModal();
+  setTimeout(() => txt.focus(), 30);
 }
 
 /* ============================================================
