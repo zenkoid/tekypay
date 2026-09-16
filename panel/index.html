@@ -294,6 +294,64 @@ dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
 .btn-azul{background:var(--azul);color:#fff}
 .btn-azul:hover{background:var(--azul-osc)}
 
+/* ── CORTE DE COBROS ───────────────────────────────────── */
+.periodo{display:flex;align-items:center;gap:8px;background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);padding:8px}
+.periodo .flecha{border:1.5px solid var(--linea);background:var(--blanco);border-radius:8px;width:40px;height:40px;font-size:20px;line-height:1;color:var(--azul);flex-shrink:0}
+.periodo .flecha:hover{background:var(--azul-suave)}
+.periodo .centro{flex:1;text-align:center;min-width:0}
+.periodo .centro b{display:block;font-size:17px;font-weight:800}
+.periodo .centro span{font-size:13px;color:var(--gris)}
+.corte-herr{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:12px 0}
+.corte-herr .interruptor{margin-left:auto}
+.btn-chico{padding:8px 12px;font-size:14px}
+.grupo-emp{font-size:13px;font-weight:800;color:var(--gris);padding:14px 2px 6px;display:flex;justify-content:space-between}
+.grupo-emp.atrasadas{color:var(--rojo)}
+.cuotas-lista{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden}
+.cf{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 14px;border-top:1px solid var(--linea)}
+.cf:first-child{border-top:none}
+.cf.marcada-cobrado{background:#F7FBEE}
+.cf.marcada-no{background:#FDF5F5}
+.cf.cubierta{opacity:.72}
+.cf-nombre{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-nombre a{color:inherit;text-decoration:none}
+.cf-nombre a:hover{text-decoration:underline}
+.cf-sub{font-size:13px;color:var(--gris);grid-column:1 / 2}
+.cf-sub span + span::before{content:"";display:inline-block;width:4px}
+.cf-monto{font-weight:800;text-align:right}
+.cf-monto small{display:block;font-size:12px;font-weight:500;color:var(--gris)}
+.cf-marcas{display:flex;flex-wrap:wrap;gap:6px;grid-column:1 / -1}
+.etq{font-size:12px;font-weight:800;border-radius:6px;padding:2px 8px}
+.etq-rojo{background:var(--rojo-suave);color:var(--rojo)}
+.etq-ambar{background:var(--ambar-suave);color:var(--ambar)}
+.etq-verde{background:var(--verde-suave);color:var(--verde-osc)}
+.cf-control{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+.segmento{display:inline-flex;border:1.5px solid var(--linea);border-radius:10px;overflow:hidden}
+.segmento button{border:none;background:var(--blanco);padding:9px 14px;font-weight:700;font-size:14px;color:var(--gris)}
+.segmento button + button{border-left:1.5px solid var(--linea)}
+.segmento button[data-res="cobrado"][aria-pressed="true"]{background:var(--verde-osc);color:#fff}
+.segmento button[data-res="no_cobrado"][aria-pressed="true"]{background:var(--rojo);color:#fff}
+.cf-control label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gris)}
+.monto-input{width:120px;padding:8px 10px;border:1.5px solid var(--linea);border-radius:8px;font:inherit;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+.monto-input.invalido{border-color:var(--rojo);background:var(--rojo-suave)}
+.motivo-nc{padding:8px 10px;border:1.5px solid var(--linea);border-radius:8px;font:inherit;font-size:15px;background:var(--blanco)}
+@media (min-width:900px){
+  .cf{grid-template-columns:minmax(0,1fr) 140px 360px;align-items:center;padding:12px 18px}
+  .cf-sub{grid-column:1 / 2}
+  .cf-marcas{grid-column:1 / 2}
+  .cf-monto{grid-row:1 / span 3;grid-column:2}
+  .cf-control{grid-row:1 / span 3;grid-column:3;margin:0;justify-content:flex-end}
+}
+.guardar-barra{position:sticky;bottom:64px;margin-top:14px;background:var(--tinta);color:#fff;border-radius:12px;padding:10px 12px;
+  display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;box-shadow:0 10px 30px -10px rgba(0,0,0,.45);z-index:10}
+.guardar-barra .cuentas{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;flex:1}
+.guardar-barra .cuentas b{font-weight:800}
+.guardar-barra .btn{margin-left:auto}
+.guardar-barra .btn-guardar{background:var(--verde);color:#1B2A00}
+.guardar-barra .btn-guardar:disabled{background:#5D6470;color:#C9CED8;opacity:1}
+@media (min-width:900px){.guardar-barra{bottom:16px}}
+.btn-mini{border:1.5px solid #E5A3A3;background:var(--blanco);color:var(--rojo);border-radius:6px;padding:3px 8px;font-size:12.5px;font-weight:700}
+.btn-mini:hover{background:var(--rojo-suave)}
+
 /* ── PANTALLAS EN CONSTRUCCIÓN ─────────────────────────── */
 .proximo{background:var(--blanco);border:1px dashed var(--linea);border-radius:var(--radio);padding:32px 22px;max-width:560px}
 .proximo h2{font-size:20px;font-weight:800;margin-bottom:6px}
@@ -385,7 +443,7 @@ dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
    tabla: todo pasa por funciones de la base que exigen una
    sesión de operador activo.
    ============================================================ */
-const PANEL_VERSION = 'panel v1.2 — módulo 3';
+const PANEL_VERSION = 'panel v1.3 — módulo 4';
 const SUPABASE_URL  = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
 const MINUTOS_INACTIVIDAD = 30;
@@ -571,7 +629,7 @@ async function entrar() {
   $('#vistaApp').hidden = false;
   vigilarInactividad();
   if (!location.hash) location.hash = '#solicitudes';
-  else enrutar();
+  else { hashAnterior = location.hash; enrutar(); }
 }
 
 async function cerrarSesion(mensaje) {
@@ -580,6 +638,7 @@ async function cerrarSesion(mensaje) {
   estado.operador = null;
   estado.bandeja = [];
   estado.resumen = null;
+  corte.marcas.clear();
   $('#contenido').innerHTML = '';
   $('#vistaApp').hidden = true;
   try { await db.auth.signOut(); } catch (e) { /* sin red: la sesión local se descarta igual */ }
@@ -625,14 +684,29 @@ function enrutar() {
 
   switch (seccion) {
     case 'solicitud': return vistaFicha(param);
-    case 'corte':     return vistaPendiente('Corte de cobros',
-      'Aquí registrarás, después de cada nómina, qué cobros aplicó Quentli y cuáles no.');
+    case 'corte':     return vistaCorte();
     case 'cartera':   return vistaPendiente('Cartera',
       'Aquí verás el saldo de cada crédito, los atrasos y el próximo cobro.');
     default:          return vistaSolicitudes();
   }
 }
-window.addEventListener('hashchange', enrutar);
+// Si hay marcas sin guardar en el corte, se pide confirmación antes de salir
+let hashAnterior = location.hash, ignorarHash = false;
+window.addEventListener('hashchange', () => {
+  if (ignorarHash) { ignorarHash = false; return; }
+  if (hashAnterior === '#corte' && location.hash !== '#corte' && corte.marcas.size &&
+      !confirm('Tienes ' + corte.marcas.size + ' movimientos sin guardar en el corte. ¿Salir sin guardarlos?')) {
+    ignorarHash = true;
+    location.hash = '#corte';
+    return;
+  }
+  if (hashAnterior === '#corte' && location.hash !== '#corte') corte.marcas.clear();
+  hashAnterior = location.hash;
+  enrutar();
+});
+window.addEventListener('beforeunload', (e) => {
+  if (corte.marcas.size) { e.preventDefault(); e.returnValue = ''; }
+});
 
 function vistaPendiente(titulo, texto) {
   $('#contenido').innerHTML =
@@ -856,12 +930,16 @@ function pintarFicha() {
         <section class="bloque">
           <h2>Cobros registrados</h2>
           <div class="tabla-scroll"><table class="cuotas">
-            <thead><tr><th>Corte</th><th>Cuota</th><th>Resultado</th><th class="der">Monto</th></tr></thead>
+            <thead><tr><th>Corte</th><th>Cuota</th><th>Resultado</th><th class="der">Monto</th><th></th></tr></thead>
             <tbody>${cobros.map(k => `
               <tr><td>${fechaCorta(k.fecha_corte)}</td><td class="num">${k.numero_pago}</td>
-              <td>${{cobrado:'Cobrado',no_cobrado:'No cobrado',reverso:'Reverso'}[k.resultado] || esc(k.resultado)}${k.revertido ? ' (revertido)' : ''}</td>
-              <td class="der num">${mxn(k.monto)}</td></tr>`).join('')}
+              <td>${{cobrado:'Cobrado',no_cobrado:'No cobrado',reverso:'Reverso'}[k.resultado] || esc(k.resultado)}${k.revertido ? ' (revertido)' : ''}
+                ${k.comentario ? `<div class="nota" style="margin:2px 0 0">${esc(k.comentario)}</div>` : ''}
+                ${k.operador ? `<div class="nota" style="margin:0">por ${esc(k.operador)}</div>` : ''}</td>
+              <td class="der num">${mxn(k.monto)}</td>
+              <td class="der">${k.resultado === 'cobrado' && !k.revertido ? `<button class="btn-mini" type="button" data-revertir="${k.id}">Revertir</button>` : ''}</td></tr>`).join('')}
             </tbody></table></div>
+          <p class="nota">Los cobros no se borran. Si uno se registró por error, revertirlo deja constancia en el historial.</p>
         </section>` : ''}
 
         <section class="bloque">
@@ -879,6 +957,53 @@ function pintarFicha() {
 
   document.querySelectorAll('[data-accion]').forEach(b =>
     b.addEventListener('click', () => ejecutarAccion(b.dataset.accion)));
+  document.querySelectorAll('[data-revertir]').forEach(b =>
+    b.addEventListener('click', () => revertirCobro(Number(b.dataset.revertir))));
+}
+
+function revertirCobro(cobroId) {
+  const s = fichaActual.solicitud;
+  const k = (fichaActual.cobros || []).find(x => x.id === cobroId);
+  if (!k) return;
+  const dlg = $('#dlg');
+  dlg.innerHTML = `
+    <form method="dialog" novalidate>
+      <h2 id="dlgTitulo">Revertir cobro</h2>
+      <p class="nota" style="margin:0">El cobro queda en el historial con un reverso por el mismo monto. La cuota vuelve a quedar pendiente${s.estado === 'liquidada' ? ' y el crédito se reabre' : ''}.</p>
+      <div class="resumen">
+        <div><span>Folio</span><span>${esc(s.folio)}</span></div>
+        <div><span>Cuota</span><span>${k.numero_pago} de ${s.numero_pagos}</span></div>
+        <div><span>Corte</span><span>${fechaCorta(k.fecha_corte)}</span></div>
+        <div><span>Monto</span><span class="num">${mxn(k.monto)}</span></div>
+      </div>
+      ${MOTIVO('Motivo del reverso', ['Quentli rechazó el cobro después', 'Se registró en la cuota equivocada', 'Monto capturado con error'])}
+      <div class="err" id="dlgError" role="alert" hidden></div>
+      <div class="pie">
+        <button class="btn btn-neutro" type="button" id="dlgCerrar">Volver</button>
+        <button class="btn btn-rechazar" type="button" id="dlgConfirmar">Revertir cobro</button>
+      </div>
+    </form>`;
+  const txt = $('#dlgTexto', dlg), err = $('#dlgError', dlg), ok = $('#dlgConfirmar', dlg);
+  dlg.querySelectorAll('[data-rapido]').forEach(b => b.addEventListener('click', () => { txt.value = b.dataset.rapido; txt.focus(); }));
+  $('#dlgCerrar', dlg).addEventListener('click', () => dlg.close());
+  ok.addEventListener('click', async () => {
+    let motivo;
+    try { motivo = leerMotivo(dlg, true); } catch (e) { err.textContent = e.message; err.hidden = false; return; }
+    ok.disabled = true;
+    ok.innerHTML = '<span class="giro" aria-hidden="true"></span>Guardando';
+    try {
+      await rpc('fn_panel_revertir_cobro', { p_cobro_id: cobroId, p_motivo: motivo });
+      dlg.close();
+      aviso('Cobro revertido. La cuota ' + k.numero_pago + ' de ' + s.folio + ' vuelve a estar pendiente.');
+      vistaFicha(s.id);
+    } catch (e) {
+      if (e.message === 'Sesión no válida') { dlg.close(); return; }
+      err.textContent = e.message; err.hidden = false;
+      ok.disabled = false; ok.textContent = 'Revertir cobro';
+    }
+  });
+  dlg.showModal();
+  setTimeout(() => txt.focus(), 30);
 }
 
 /* ── Fechas: réplica de la base ──────────────────────────────
@@ -1136,6 +1261,339 @@ function ejecutarAccion(tipo) {
   dlg.showModal();
   const primero = dlg.querySelector('input, textarea');
   if (primero) setTimeout(() => primero.focus(), 30);
+}
+
+
+/* ============================================================
+   VISTA: CORTE DE COBROS (módulo 4)
+   Después de cada nómina el operador marca, con el reporte de
+   Quentli a la mano, qué cuotas se cobraron y cuáles no.
+   Todo el corte se guarda en una sola operación: entra completo
+   o no entra.
+   ============================================================ */
+const corte = {
+  desde: null, hasta: null,
+  filas: [],
+  marcas: new Map(),      // amortizacion_id → { resultado, monto, motivo }
+  turno: 0,
+};
+const MOTIVOS_NC = ['Sin fondos', 'Baja de nómina', 'Incapacidad o permiso', 'Rechazo del banco', 'Otro'];
+
+function isoDe(y, m0, d) { return isoLocal(new Date(y, m0, d)); }
+function quincena(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return d <= 15
+    ? { desde: isoDe(y, m - 1, 1),  hasta: isoDe(y, m - 1, 15) }
+    : { desde: isoDe(y, m - 1, 16), hasta: isoDe(y, m - 1, ultimoDia(y, m - 1)) };
+}
+// El corte más reciente que ya ocurrió:
+//   fin de mes            → 16 al fin de este mes
+//   del 15 al penúltimo   → 1 al 15 de este mes
+//   antes del 15          → 16 al fin del mes anterior
+function corteReciente() {
+  const [y, m, d] = hoyMX().split('-').map(Number);
+  if (d === ultimoDia(y, m - 1)) return quincena(isoDe(y, m - 1, 16));
+  if (d >= 15)                   return quincena(isoDe(y, m - 1, 1));
+  return quincena(isoDe(y, m - 2, 16));
+}
+function moverQuincena(dir) {
+  const [y, m, d] = corte.desde.split('-').map(Number);
+  const q = dir < 0
+    ? (d === 1 ? quincena(isoDe(y, m - 2, 16)) : quincena(isoDe(y, m - 1, 1)))
+    : (d === 1 ? quincena(isoDe(y, m - 1, 16)) : quincena(isoDe(y, m, 1)));
+  corte.desde = q.desde; corte.hasta = q.hasta;
+}
+function aNumero(txt) {
+  const n = Number(String(txt).replace(/[$,\s]/g, ''));
+  return isFinite(n) ? Math.round(n * 100) / 100 : NaN;
+}
+
+function vistaCorte() {
+  if (!corte.desde) Object.assign(corte, corteReciente());
+  const [yd, md, dd] = corte.desde.split('-').map(Number);
+  const [yh, mh, dh] = corte.hasta.split('-').map(Number);
+  const mes = new Date(yh, mh - 1, 1).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+
+  $('#contenido').innerHTML = `
+    <div class="periodo">
+      <button class="flecha" type="button" id="qAnt" aria-label="Quincena anterior">‹</button>
+      <div class="centro">
+        <b>Corte del ${dh} de ${esc(mes)}</b>
+        <span>Cuotas del ${dd} al ${dh}, más las atrasadas</span>
+      </div>
+      <button class="flecha" type="button" id="qSig" aria-label="Quincena siguiente">›</button>
+    </div>
+    <div class="corte-herr">
+      <button class="btn btn-texto btn-chico" type="button" id="btnTodoCobrado">Marcar pendientes como cobrados</button>
+      <button class="btn btn-texto btn-chico" type="button" id="btnLimpiar">Quitar marcas</button>
+      <label class="interruptor">
+        <input type="checkbox" id="chkPruebaCorte" ${estado.incluirPrueba ? 'checked' : ''}>
+        Mostrar datos de prueba
+      </label>
+    </div>
+    <div id="corteLista"><div class="cuotas-lista"><div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div></div></div>
+    <div class="guardar-barra" id="barraGuardar" hidden></div>
+    <p class="version">${PANEL_VERSION}</p>`;
+
+  const cambiarPeriodo = (dir) => {
+    if (corte.marcas.size && !confirm('Tienes movimientos sin guardar. ¿Cambiar de quincena y descartarlos?')) return;
+    moverQuincena(dir);
+    corte.marcas.clear();
+    vistaCorte();
+  };
+  $('#qAnt').addEventListener('click', () => cambiarPeriodo(-1));
+  $('#qSig').addEventListener('click', () => cambiarPeriodo(1));
+  $('#chkPruebaCorte').addEventListener('change', (e) => {
+    if (corte.marcas.size && !confirm('Tienes movimientos sin guardar. ¿Descartarlos?')) { e.target.checked = !e.target.checked; return; }
+    estado.incluirPrueba = e.target.checked;
+    $('#franjaPrueba').hidden = !estado.incluirPrueba;
+    corte.marcas.clear();
+    cargarCorte();
+  });
+  $('#btnTodoCobrado').addEventListener('click', () => {
+    corte.filas.forEach(f => {
+      if (f.estatus !== 'cubierta' && !corte.marcas.has(f.amortizacion_id))
+        corte.marcas.set(f.amortizacion_id, { resultado: 'cobrado', monto: String(Number(f.pendiente).toFixed(2)) });
+    });
+    pintarCorte();
+  });
+  $('#btnLimpiar').addEventListener('click', () => {
+    if (corte.marcas.size && !confirm('¿Quitar todas las marcas de este corte?')) return;
+    corte.marcas.clear();
+    pintarCorte();
+  });
+
+  // Un solo escucha para toda la lista
+  const lista = $('#corteLista');
+  lista.addEventListener('click', (ev) => {
+    const b = ev.target.closest('[data-res]');
+    if (!b) return;
+    const id = b.closest('[data-id]').dataset.id;
+    const fila = corte.filas.find(f => f.amortizacion_id === id);
+    const actual = corte.marcas.get(id);
+    if (actual && actual.resultado === b.dataset.res) corte.marcas.delete(id);      // tocar de nuevo desmarca
+    else if (b.dataset.res === 'cobrado') corte.marcas.set(id, { resultado: 'cobrado', monto: String(Number(fila.pendiente).toFixed(2)) });
+    else corte.marcas.set(id, { resultado: 'no_cobrado', motivo: MOTIVOS_NC[0] });
+    pintarFilaCorte(id);
+    pintarBarraGuardar();
+  });
+  lista.addEventListener('input', (ev) => {
+    const el = ev.target;
+    const id = el.closest('[data-id]') && el.closest('[data-id]').dataset.id;
+    if (!id || !corte.marcas.has(id)) return;
+    if (el.classList.contains('monto-input')) {
+      corte.marcas.get(id).monto = el.value;
+      el.classList.toggle('invalido', !!errorMonto(id));
+      pintarBarraGuardar();
+    }
+    if (el.classList.contains('motivo-nc')) corte.marcas.get(id).motivo = el.value;
+  });
+
+  cargarCorte();
+}
+
+async function cargarCorte() {
+  const turno = ++corte.turno;
+  try {
+    const datos = await rpc('fn_panel_corte', {
+      p_desde: corte.desde, p_hasta: corte.hasta, p_incluir_prueba: estado.incluirPrueba,
+    });
+    if (turno !== corte.turno || !$('#corteLista')) return;
+    corte.filas = datos || [];
+    pintarCorte();
+  } catch (e) {
+    if (e.message === 'Sesión no válida' || !$('#corteLista')) return;
+    $('#corteLista').innerHTML = `<div class="vacio cuotas-lista"><strong>No se pudo cargar el corte</strong>${esc(e.message)}</div>`;
+  }
+}
+
+function errorMonto(id) {
+  const m = corte.marcas.get(id);
+  if (!m || m.resultado !== 'cobrado') return '';
+  const fila = corte.filas.find(f => f.amortizacion_id === id);
+  const v = aNumero(m.monto);
+  if (!(v > 0)) return 'El monto debe ser mayor a cero';
+  if (v > Number(fila.pendiente) + 0.01) return 'Excede lo pendiente (' + mxn(fila.pendiente) + ')';
+  return '';
+}
+
+function htmlFilaCorte(f) {
+  const m = corte.marcas.get(f.amortizacion_id);
+  const cubierta = f.estatus === 'cubierta';
+  const cobrado = Number(f.cobrado) || 0;
+  const clase = cubierta ? 'cubierta' : m ? (m.resultado === 'cobrado' ? 'marcada-cobrado' : 'marcada-no') : '';
+  const etiquetas = [
+    f.es_atrasada && !cubierta ? `<span class="etq etq-rojo">Atrasada</span>` : '',
+    f.intentos_fallidos > 0 ? `<span class="etq etq-ambar">${f.intentos_fallidos} ${f.intentos_fallidos == 1 ? 'intento fallido' : 'intentos fallidos'}</span>` : '',
+    cobrado > 0 && !cubierta ? `<span class="etq etq-ambar">Ya cobrado ${mxn(cobrado)} de ${mxn(f.monto)}</span>` : '',
+    cubierta ? `<span class="etq etq-verde">Cubierta</span>` : '',
+  ].join('');
+
+  let control = '';
+  if (!cubierta) {
+    control = `
+      <div class="segmento" role="group" aria-label="Resultado del cobro">
+        <button type="button" data-res="cobrado" aria-pressed="${!!m && m.resultado === 'cobrado'}">Cobrado</button>
+        <button type="button" data-res="no_cobrado" aria-pressed="${!!m && m.resultado === 'no_cobrado'}">No cobrado</button>
+      </div>`;
+    if (m && m.resultado === 'cobrado') {
+      const err = errorMonto(f.amortizacion_id);
+      control += `<label>Monto <input class="monto-input ${err ? 'invalido' : ''}" inputmode="decimal" value="${esc(m.monto)}" aria-label="Monto cobrado"></label>`;
+    }
+    if (m && m.resultado === 'no_cobrado') {
+      control += `<select class="motivo-nc" aria-label="Motivo">${MOTIVOS_NC.map(x =>
+        `<option ${x === m.motivo ? 'selected' : ''}>${x}</option>`).join('')}</select>`;
+    }
+  }
+
+  return `
+    <div class="cf ${clase}" data-id="${esc(f.amortizacion_id)}">
+      <div class="cf-nombre"><a href="#solicitud/${esc(f.solicitud_id)}">${esc(f.nombre_completo)}</a></div>
+      <div class="cf-monto num">${mxn(cubierta ? f.monto : f.pendiente)}<small>${cubierta ? 'cobrado' : 'por cobrar'}</small></div>
+      <div class="cf-sub"><span class="folio">${esc(f.folio)}</span><span>Cuota ${f.numero_pago} de ${f.numero_pagos}</span><span>vence ${fechaCorta(f.fecha_cobro)}</span><span>Quentli ${esc(f.referencia_quentli || 'sin referencia')}</span></div>
+      ${etiquetas ? `<div class="cf-marcas">${etiquetas}</div>` : ''}
+      ${control ? `<div class="cf-control">${control}</div>` : ''}
+    </div>`;
+}
+
+function pintarFilaCorte(id) {
+  const el = document.querySelector(`#corteLista [data-id="${CSS.escape(id)}"]`);
+  const f = corte.filas.find(x => x.amortizacion_id === id);
+  if (el && f) el.outerHTML = htmlFilaCorte(f);
+}
+
+function pintarCorte() {
+  const cont = $('#corteLista');
+  if (!cont) return;
+  const filas = corte.filas;
+  if (!filas.length) {
+    cont.innerHTML = `<div class="vacio cuotas-lista"><strong>No hay cobros en esta quincena</strong>
+      Aquí aparecen las cuotas de créditos formalizados o activos.${estado.incluirPrueba ? '' : '<br><br>Los datos de prueba están ocultos.'}</div>`;
+    pintarBarraGuardar();
+    return;
+  }
+  // Agrupa: primero las atrasadas, después por empresa (orden que ya trae la base)
+  const grupos = [];
+  filas.forEach(f => {
+    const clave = f.es_atrasada ? '__atrasadas' : (f.empresa || 'Empresa sin nombre');
+    let g = grupos.find(x => x.clave === clave);
+    if (!g) grupos.push(g = { clave, filas: [] });
+    g.filas.push(f);
+  });
+  cont.innerHTML = grupos.map(g => {
+    const pend = g.filas.filter(f => f.estatus !== 'cubierta');
+    const total = pend.reduce((a, f) => a + Number(f.pendiente), 0);
+    const titulo = g.clave === '__atrasadas' ? 'Atrasadas de cortes anteriores' : g.clave;
+    return `<div class="grupo-emp ${g.clave === '__atrasadas' ? 'atrasadas' : ''}">
+        <span>${esc(titulo)}</span>
+        <span class="num">${pend.length ? pend.length + ' por cobrar, ' + mxn(total) : 'Todo cubierto'}</span>
+      </div>
+      <div class="cuotas-lista">${g.filas.map(htmlFilaCorte).join('')}</div>`;
+  }).join('');
+  pintarBarraGuardar();
+}
+
+function resumenMarcas() {
+  let cobrados = 0, suma = 0, noCobrados = 0, invalidos = 0;
+  corte.marcas.forEach((m, id) => {
+    if (m.resultado === 'cobrado') {
+      cobrados++;
+      if (errorMonto(id)) invalidos++; else suma += aNumero(m.monto);
+    } else noCobrados++;
+  });
+  const sinMarcar = corte.filas.filter(f => f.estatus !== 'cubierta' && !corte.marcas.has(f.amortizacion_id)).length;
+  return { cobrados, suma, noCobrados, invalidos, sinMarcar };
+}
+
+function pintarBarraGuardar() {
+  const barra = $('#barraGuardar');
+  if (!barra) return;
+  const pendientes = corte.filas.filter(f => f.estatus !== 'cubierta').length;
+  if (!pendientes && !corte.marcas.size) { barra.hidden = true; return; }
+  const r = resumenMarcas();
+  barra.hidden = false;
+  barra.innerHTML = `
+    <div class="cuentas">
+      <span><b class="num">${r.cobrados}</b> cobrados <b class="num">${mxn(r.suma)}</b></span>
+      <span><b class="num">${r.noCobrados}</b> no cobrados</span>
+      <span><b class="num">${r.sinMarcar}</b> sin marcar</span>
+    </div>
+    <button class="btn btn-guardar" type="button" id="btnGuardarCorte" ${corte.marcas.size && !r.invalidos ? '' : 'disabled'}>
+      ${r.invalidos ? 'Revisa los montos' : 'Revisar y guardar'}
+    </button>`;
+  $('#btnGuardarCorte').addEventListener('click', confirmarCorte);
+}
+
+function confirmarCorte() {
+  const r = resumenMarcas();
+  if (!corte.marcas.size || r.invalidos) return;
+  const parciales = [...corte.marcas].filter(([id, m]) => {
+    const f = corte.filas.find(x => x.amortizacion_id === id);
+    return m.resultado === 'cobrado' && aNumero(m.monto) < Number(f.pendiente) - 0.005;
+  }).length;
+  const dlg = $('#dlg');
+  dlg.innerHTML = `
+    <form method="dialog" novalidate>
+      <h2 id="dlgTitulo">Guardar corte del ${fechaCorta(corte.hasta)}</h2>
+      <p class="nota" style="margin:0">Los movimientos se guardan todos juntos. Si alguno tiene un problema, no se guarda ninguno y te decimos cuál revisar.</p>
+      <div class="resumen">
+        <div><span>Cobrados</span><span class="num">${r.cobrados}</span></div>
+        <div><span>Monto cobrado</span><span class="num">${mxn(r.suma)}</span></div>
+        <div><span>No cobrados</span><span class="num">${r.noCobrados}</span></div>
+        <div><span>Quedan sin marcar</span><span class="num">${r.sinMarcar}</span></div>
+      </div>
+      ${parciales ? `<div class="alerta-caja">${parciales} ${parciales === 1 ? 'cobro es parcial' : 'cobros son parciales'}: la cuota seguirá con saldo pendiente.</div>` : ''}
+      ${r.sinMarcar ? `<div class="alerta-caja">Las cuotas sin marcar quedan como están. Puedes registrarlas después.</div>` : ''}
+      ${estado.incluirPrueba ? `<div class="alerta-caja">Estás viendo datos de prueba: si marcaste alguno, también se guardará.</div>` : ''}
+      <label for="refCorte">Referencia del reporte de Quentli (opcional)</label>
+      <input id="refCorte" class="entrada" maxlength="80" placeholder="Por ejemplo: Reporte Quentli ${fechaCorta(corte.hasta)}">
+      <div class="err" id="dlgError" role="alert" hidden></div>
+      <div class="pie">
+        <button class="btn btn-neutro" type="button" id="dlgCerrar">Volver</button>
+        <button class="btn btn-aprobar" type="button" id="dlgConfirmar">Guardar corte</button>
+      </div>
+    </form>`;
+  const err = $('#dlgError', dlg), ok = $('#dlgConfirmar', dlg);
+  $('#dlgCerrar', dlg).addEventListener('click', () => dlg.close());
+  ok.addEventListener('click', async () => {
+    const ref = $('#refCorte', dlg).value.trim() || null;
+    const movimientos = [...corte.marcas].map(([id, m]) => m.resultado === 'cobrado'
+      ? { amortizacion_id: id, resultado: 'cobrado', monto: aNumero(m.monto), referencia: ref }
+      : { amortizacion_id: id, resultado: 'no_cobrado', comentario: m.motivo, referencia: ref });
+    ok.disabled = true;
+    ok.innerHTML = '<span class="giro" aria-hidden="true"></span>Guardando';
+    try {
+      const res = await rpc('fn_panel_registrar_corte', { p_fecha_corte: corte.hasta, p_movimientos: movimientos });
+      const r0 = (res && res[0]) || { registrados: movimientos.length, liquidadas: 0 };
+      dlg.close();
+      corte.marcas.clear();
+      estado.resumen = null;
+      aviso('Corte guardado: ' + r0.registrados + ' movimientos' +
+            (r0.liquidadas ? ', ' + r0.liquidadas + (r0.liquidadas == 1 ? ' crédito liquidado' : ' créditos liquidados') : '') + '.');
+      cargarCorte();
+    } catch (e) {
+      if (e.message === 'Sesión no válida') { dlg.close(); return; }
+      if (/ya estaba cubierta/i.test(e.message)) {
+        // Alguien más registró parte de este corte: se refresca la lista y se
+        // quitan las marcas de cuotas que ya quedaron cubiertas.
+        await cargarCorte();
+        let quitadas = 0;
+        [...corte.marcas.keys()].forEach(id => {
+          const f = corte.filas.find(x => x.amortizacion_id === id);
+          if (!f || f.estatus === 'cubierta') { corte.marcas.delete(id); quitadas++; }
+        });
+        pintarCorte();
+        dlg.close();
+        aviso('No se guardó ningún movimiento. ' + quitadas + (quitadas === 1 ? ' cuota ya había sido registrada' : ' cuotas ya habían sido registradas') +
+              ' por otra sesión; quitamos esas marcas. Revisa y vuelve a guardar.', 'error');
+        return;
+      }
+      err.textContent = 'No se guardó ningún movimiento. ' + e.message;
+      err.hidden = false;
+      ok.disabled = false; ok.textContent = 'Guardar corte';
+    }
+  });
+  dlg.showModal();
 }
 
 /* ============================================================
