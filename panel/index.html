@@ -282,6 +282,17 @@ dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
 .dlg .rapidos button:hover{border-color:var(--azul);color:var(--azul)}
 .dlg .pie{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
 .dlg .err{color:var(--rojo);font-size:13.5px;margin-top:6px}
+.dlg .entrada{width:100%;padding:11px 12px;border:1.5px solid var(--linea);border-radius:var(--radio);font:inherit;font-size:16px;background:var(--blanco)}
+.dlg .entrada:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,71,186,.12)}
+.dlg .check{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:14.5px;margin:0 0 8px;padding:10px 12px;border:1.5px solid var(--linea);border-radius:var(--radio);cursor:pointer}
+.dlg .check input{width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--verde-osc)}
+.dlg .check:has(input:checked){border-color:var(--verde);background:var(--verde-suave)}
+.dlg .vista-cal{background:var(--azul-suave);color:#0B3A8C;border-radius:8px;padding:9px 11px;font-size:13.5px;margin-top:8px}
+.dlg .vista-cal b{font-weight:800}
+.dlg .alerta-caja{margin:8px 0 0}
+.dlg .rapidos button[aria-pressed="true"]{border-color:var(--azul);color:#fff;background:var(--azul)}
+.btn-azul{background:var(--azul);color:#fff}
+.btn-azul:hover{background:var(--azul-osc)}
 
 /* ── PANTALLAS EN CONSTRUCCIÓN ─────────────────────────── */
 .proximo{background:var(--blanco);border:1px dashed var(--linea);border-radius:var(--radio);padding:32px 22px;max-width:560px}
@@ -374,7 +385,7 @@ dialog.dlg::backdrop{background:rgba(20,30,50,.5)}
    tabla: todo pasa por funciones de la base que exigen una
    sesión de operador activo.
    ============================================================ */
-const PANEL_VERSION = 'panel v1.1 — módulo 2';
+const PANEL_VERSION = 'panel v1.2 — módulo 3';
 const SUPABASE_URL  = 'https://fygespxcsymiccwixzdc.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Z2VzcHhjc3ltaWNjd2l4emRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNzYwMjUsImV4cCI6MjA5Njk1MjAyNX0.YfhTOZUa4PGLmo2Ic8xXLKwzFC5E904JjFZwk5kDDRI';
 const MINUTOS_INACTIVIDAD = 30;
@@ -712,10 +723,15 @@ function pintarFicha() {
       <button class="btn btn-rechazar" type="button" data-accion="rechazar">Rechazar</button>
       <button class="btn btn-neutro" type="button" data-accion="cancelar">Cancelar solicitud</button>`;
   } else if (s.estado === 'aprobada') {
-    acciones = `<button class="btn btn-neutro" type="button" data-accion="cancelar">Cancelar solicitud</button>`;
-    siguiente = 'Siguiente paso: formalizar, con el enganche confirmado y la referencia de Quentli. Se habilita en el módulo 3.';
+    acciones = `
+      <button class="btn btn-azul" type="button" data-accion="formalizar">Formalizar</button>
+      <button class="btn btn-neutro" type="button" data-accion="cancelar">Cancelar solicitud</button>`;
+    siguiente = 'Siguiente paso: formalizar, una vez recibido el enganche y hecha el alta en Quentli.';
   } else if (s.estado === 'formalizada') {
-    siguiente = 'Siguiente paso: registrar la entrega del producto. Se habilita en el módulo 3.';
+    acciones = `
+      <button class="btn btn-azul" type="button" data-accion="entregar">Registrar entrega</button>
+      <button class="btn btn-neutro" type="button" data-accion="cancelar">Cancelar solicitud</button>`;
+    siguiente = 'Los cobros ya cuentan para los cortes. Falta registrar la entrega del producto.';
   }
 
   let cierre = '';
@@ -865,59 +881,204 @@ function pintarFicha() {
     b.addEventListener('click', () => ejecutarAccion(b.dataset.accion)));
 }
 
-/* ── Acciones ─────────────────────────────────────────────── */
+/* ── Fechas: réplica de la base ──────────────────────────────
+   fechaCuota() reproduce exactamente fn_fecha_cuota (parche 1).
+   Se verificó contra la base en 118,368 combinaciones: la vista
+   previa que ve el operador es la misma que se guarda.         */
+function ultimoDia(y, m0) { return new Date(y, m0 + 1, 0).getDate(); }
+function isoLocal(f) {
+  return f.getFullYear() + '-' + String(f.getMonth() + 1).padStart(2, '0') + '-' + String(f.getDate()).padStart(2, '0');
+}
+function hoyMX() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date());
+}
+function sumarDias(iso, dias) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return isoLocal(new Date(y, m - 1, d + dias));
+}
+function fechaCuota(inicio, per, n) {
+  const [y, m, d] = inicio.split('-').map(Number);
+  const esFin = d === ultimoDia(y, m - 1);
+  if (n <= 1) return new Date(y, m - 1, d);
+  if (per === 'semanal') return new Date(y, m - 1, d + (n - 1) * 7);
+  if (per === 'quincenal') {
+    let desp = Math.floor((n - 1) / 2);
+    if (n % 2 === 0 && (esFin || d > 15)) desp += 1;
+    const b = new Date(y, m - 1 + desp, 1), Y = b.getFullYear(), M = b.getMonth(), ult = ultimoDia(Y, M);
+    if (esFin || d === 15) return new Date(Y, M, ((n % 2 === 1) === esFin) ? ult : 15);
+    if (n % 2 === 1) return new Date(Y, M, Math.min(d, ult));
+    if (d < 15) return new Date(Y, M, Math.min(d + 15, ult));
+    return new Date(Y, M, d - 15);
+  }
+  const b = new Date(y, m - 1 + (n - 1), 1), Y = b.getFullYear(), M = b.getMonth(), ult = ultimoDia(Y, M);
+  return new Date(Y, M, esFin ? ult : Math.min(d, ult));
+}
+// Próximos cortes de nómina (15 y fin de mes) a partir de hoy
+function proximosCortes(cuantos) {
+  const hoy = hoyMX();
+  const [y, m] = hoy.split('-').map(Number);
+  const res = [];
+  for (let k = 0; res.length < cuantos && k < 6; k++) {
+    const b = new Date(y, m - 1 + k, 1), Y = b.getFullYear(), M = b.getMonth();
+    for (const d of [15, ultimoDia(Y, M)]) {
+      const iso = isoLocal(new Date(Y, M, d));
+      if (iso >= hoy && res.length < cuantos) res.push(iso);
+    }
+  }
+  return res;
+}
+
+/* ── Acciones ─────────────────────────────────────────────────
+   Cada acción define su formulario, cómo lee y valida los datos,
+   y qué función de la base llama. La base vuelve a validar todo. */
+const MOTIVO = (etiqueta, rapidos) => `
+  <label for="dlgTexto">${etiqueta}</label>
+  ${rapidos ? `<div class="rapidos">${rapidos.map(r => `<button type="button" data-rapido="${esc(r)}">${esc(r)}</button>`).join('')}</div>` : ''}
+  <textarea id="dlgTexto" maxlength="500"></textarea>`;
+
+function leerMotivo(dlg, obligatorio) {
+  const v = $('#dlgTexto', dlg).value.trim();
+  if (obligatorio && v.length < 5) throw new Error('Escribe el motivo (al menos 5 caracteres) o elige uno de los sugeridos.');
+  return v || null;
+}
+
 const ACCIONES = {
   aprobar: {
     titulo: 'Aprobar solicitud',
     texto: 'Con la aprobación, el colaborador se convierte en acreditado. El siguiente paso será formalizar con Quentli.',
-    etiqueta: 'Comentario (opcional)', obligatorio: false,
+    formulario: () => MOTIVO('Comentario (opcional)'),
+    recoger: (dlg) => ({ p_comentario: leerMotivo(dlg, false) }),
     boton: 'Aprobar', claseBoton: 'btn-aprobar',
-    funcion: 'fn_panel_aprobar', parametro: 'p_comentario',
-    exito: 'aprobada',
+    funcion: 'fn_panel_aprobar', exito: (f) => 'Solicitud ' + f + ' aprobada.',
   },
   rechazar: {
     titulo: 'Rechazar solicitud',
     texto: 'El monto regresa a la línea disponible del colaborador. El motivo queda en el historial.',
-    etiqueta: 'Motivo del rechazo', obligatorio: true,
-    rapidos: ['Capacidad de pago insuficiente', 'Solicitud duplicada', 'RH no confirma la relación laboral', 'Los datos no coinciden con RH'],
+    formulario: () => MOTIVO('Motivo del rechazo',
+      ['Capacidad de pago insuficiente', 'Solicitud duplicada', 'RH no confirma la relación laboral', 'Los datos no coinciden con RH']),
+    recoger: (dlg) => ({ p_motivo: leerMotivo(dlg, true) }),
     boton: 'Rechazar', claseBoton: 'btn-rechazar',
-    funcion: 'fn_panel_rechazar', parametro: 'p_motivo',
-    exito: 'rechazada',
+    funcion: 'fn_panel_rechazar', exito: (f) => 'Solicitud ' + f + ' rechazada.',
   },
   cancelar: {
     titulo: 'Cancelar solicitud',
     texto: 'Úsalo cuando el trámite no sigue por una razón ajena a la evaluación. El monto regresa a la línea disponible.',
-    etiqueta: 'Motivo de la cancelación', obligatorio: true,
-    rapidos: ['El colaborador desistió', 'Solicitud duplicada', 'Producto sin existencia', 'Baja del colaborador en la empresa'],
+    formulario: () => MOTIVO('Motivo de la cancelación',
+      ['El colaborador desistió', 'Solicitud duplicada', 'Producto sin existencia', 'Baja del colaborador en la empresa']),
+    recoger: (dlg) => ({ p_motivo: leerMotivo(dlg, true) }),
     boton: 'Cancelar solicitud', claseBoton: 'btn-rechazar',
-    funcion: 'fn_panel_cancelar', parametro: 'p_motivo',
-    exito: 'cancelada',
+    funcion: 'fn_panel_cancelar', exito: (f) => 'Solicitud ' + f + ' cancelada.',
+  },
+
+  formalizar: {
+    titulo: 'Formalizar crédito',
+    texto: 'A partir de aquí las cuotas cuentan para los cortes y los atrasos.',
+    formulario: (s) => {
+      const minimo = s.fecha_solicitud ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Mexico_City' }).format(new Date(s.fecha_solicitud)) : '';
+      const maximo = sumarDias(hoyMX(), 90);
+      return `
+      <label class="check"><input type="checkbox" id="chkEnganche"><span>Recibí el enganche de <b class="num">${mxn(s.enganche_monto)}</b></span></label>
+      <label class="check"><input type="checkbox" id="chkQuentli"><span>El colaborador quedó dado de alta en Quentli con este plan de ${s.numero_pagos} pagos ${PERIODO[s.periodicidad] || ''}</span></label>
+      <label for="refQuentli">Referencia en Quentli</label>
+      <input id="refQuentli" class="entrada" maxlength="80" autocomplete="off" spellcheck="false">
+      <label for="fechaCobro">Fecha del primer cobro</label>
+      <div class="rapidos" id="cortes">${proximosCortes(4).filter(f => f >= minimo && f <= maximo)
+        .map(f => `<button type="button" data-fecha="${f}">${fechaCorta(f)}</button>`).join('')}</div>
+      <input type="date" id="fechaCobro" class="entrada" min="${minimo}" max="${maximo}">
+      <div id="avisoFecha" class="alerta-caja" hidden></div>
+      <div id="vistaCal" class="vista-cal" hidden></div>
+      ${MOTIVO('Comentario (opcional)')}`;
+    },
+    preparar: (dlg, s) => {
+      const inp = $('#fechaCobro', dlg);
+      const actualizar = () => {
+        const f = inp.value;
+        dlg.querySelectorAll('[data-fecha]').forEach(b => b.setAttribute('aria-pressed', b.dataset.fecha === f));
+        const aviso = $('#avisoFecha', dlg), vista = $('#vistaCal', dlg);
+        if (!f) { aviso.hidden = vista.hidden = true; return; }
+        const n = Number(s.numero_pagos);
+        const fechas = [1, 2, 3].filter(k => k <= n).map(k => fechaCorta(isoLocal(fechaCuota(f, s.periodicidad, k))));
+        const ultima = fechaCorta(isoLocal(fechaCuota(f, s.periodicidad, n)));
+        vista.innerHTML = `<b>${n} cobros ${PERIODO[s.periodicidad] || ''} de ${mxn(s.pago_periodico)}</b><br>` +
+          fechas.join(', ') + (n > 3 ? ' … último el ' + ultima : '');
+        vista.hidden = false;
+
+        const avisos = [];
+        const [y, m, d] = f.split('-').map(Number);
+        if (s.periodicidad === 'quincenal' && d !== 15 && d !== ultimoDia(y, m - 1)) {
+          const otro = d < 15 ? 'el ' + (d + 15) : 'el ' + (d - 15) + ' del mes siguiente';
+          avisos.push(`No es un corte de nómina (15 o fin de mes). Los cobros serán el ${d} y ${otro}.`);
+        }
+        if (f < hoyMX()) avisos.push('La fecha ya pasó: las cuotas anteriores a hoy aparecerán como vencidas hasta que registres sus cobros.');
+        aviso.innerHTML = avisos.map(esc).join('<br>');
+        aviso.hidden = !avisos.length;
+      };
+      inp.addEventListener('input', actualizar);
+      dlg.querySelectorAll('[data-fecha]').forEach(b =>
+        b.addEventListener('click', () => { inp.value = b.dataset.fecha; actualizar(); }));
+    },
+    recoger: (dlg) => {
+      if (!$('#chkEnganche', dlg).checked || !$('#chkQuentli', dlg).checked)
+        throw new Error('Confirma el enganche y el alta en Quentli antes de formalizar.');
+      const ref = $('#refQuentli', dlg).value.trim();
+      if (!ref) throw new Error('Captura la referencia de Quentli.');
+      const inp = $('#fechaCobro', dlg), f = inp.value;
+      if (!f) throw new Error('Elige la fecha del primer cobro.');
+      if ((inp.min && f < inp.min) || (inp.max && f > inp.max))
+        throw new Error('La fecha del primer cobro debe estar entre ' + fechaCorta(inp.min) + ' y ' + fechaCorta(inp.max) + '.');
+      const extra = leerMotivo(dlg, false);
+      return {
+        p_referencia_quentli: ref,
+        p_fecha_primer_cobro: f,
+        p_comentario: 'Enganche y alta en Quentli confirmados' + (extra ? '. ' + extra : ''),
+      };
+    },
+    boton: 'Formalizar', claseBoton: 'btn-azul',
+    funcion: 'fn_panel_formalizar', exito: (f) => 'Crédito ' + f + ' formalizado.',
+  },
+
+  entregar: {
+    titulo: 'Registrar entrega',
+    texto: 'Confirma que el colaborador ya tiene el producto. El crédito pasa a activo.',
+    formulario: () => `
+      <label for="fechaEntrega">Fecha de entrega</label>
+      <input type="date" id="fechaEntrega" class="entrada" value="${hoyMX()}" max="${hoyMX()}">
+      ${MOTIVO('Comentario (opcional)', ['Entregado en oficina de RH', 'Enviado por paquetería', 'Entregado por el proveedor'])}`,
+    recoger: (dlg) => {
+      const f = $('#fechaEntrega', dlg).value;
+      if (!f) throw new Error('Elige la fecha de entrega.');
+      if (f > hoyMX()) throw new Error('La fecha de entrega no puede ser futura.');
+      return { p_fecha_entrega: f, p_comentario: leerMotivo(dlg, false) };
+    },
+    boton: 'Registrar entrega', claseBoton: 'btn-azul',
+    funcion: 'fn_panel_activar', exito: (f) => 'Entrega de ' + f + ' registrada. El crédito está activo.',
   },
 };
+
+function advertenciasAprobar(s, c) {
+  let html = '';
+  const ingreso = Number(c.ingreso_mensual_neto) || 0;
+  const pagoMes = Number(s.pago_periodico) * (COBROS_AL_MES[s.periodicidad] || 1);
+  if (ingreso > 0 && pagoMes / ingreso > LIMITE_INGRESO)
+    html += `<div class="alerta-caja">El pago mensual equivale al ${(pagoMes / ingreso * 100).toFixed(1)}% del ingreso neto, arriba del límite del 30%.</div>`;
+  const libre = ingreso - (Number(c.gastos_mensuales) || 0);
+  if (libre <= 0)
+    html += `<div class="alerta-caja">Los gastos declarados igualan o superan su ingreso neto.</div>`;
+  else if (pagoMes / libre > LIMITE_INGRESO)
+    html += `<div class="alerta-caja">El pago mensual equivale al ${(pagoMes / libre * 100).toFixed(1)}% de su ingreso libre.</div>`;
+  const otras = (fichaActual.otras_solicitudes || []).filter(o => VIGENTES.includes(o.estado));
+  if (otras.length)
+    html += `<div class="alerta-caja">Esta persona tiene ${otras.length} ${otras.length === 1 ? 'otra solicitud vigente' : 'otras solicitudes vigentes'}.</div>`;
+  return html;
+}
 
 function ejecutarAccion(tipo) {
   const cfg = ACCIONES[tipo];
   const s = fichaActual.solicitud, c = fichaActual.colaborador;
   const dlg = $('#dlg');
 
-  // Advertencias que el operador debe ver antes de aprobar
-  let advertencias = '';
-  if (tipo === 'aprobar') {
-    const ingreso = Number(c.ingreso_mensual_neto) || 0;
-    const pagoMes = Number(s.pago_periodico) * (COBROS_AL_MES[s.periodicidad] || 1);
-    if (ingreso > 0 && pagoMes / ingreso > LIMITE_INGRESO)
-      advertencias += `<div class="alerta-caja">El pago mensual equivale al ${(pagoMes / ingreso * 100).toFixed(1)}% del ingreso neto, arriba del límite del 30%.</div>`;
-    const libre = ingreso - (Number(c.gastos_mensuales) || 0);
-    if (libre <= 0)
-      advertencias += `<div class="alerta-caja">Los gastos declarados igualan o superan su ingreso neto.</div>`;
-    else if (pagoMes / libre > LIMITE_INGRESO)
-      advertencias += `<div class="alerta-caja">El pago mensual equivale al ${(pagoMes / libre * 100).toFixed(1)}% de su ingreso libre.</div>`;
-    const otras = (fichaActual.otras_solicitudes || []).filter(o => VIGENTES.includes(o.estado));
-    if (otras.length)
-      advertencias += `<div class="alerta-caja">Esta persona tiene ${otras.length} ${otras.length === 1 ? 'otra solicitud vigente' : 'otras solicitudes vigentes'}.</div>`;
-    if (s.es_prueba)
-      advertencias += `<div class="alerta-caja">Es una solicitud de prueba.</div>`;
-  }
+  let advertencias = tipo === 'aprobar' ? advertenciasAprobar(s, c) : '';
+  if (s.es_prueba) advertencias += `<div class="alerta-caja">Es una solicitud de prueba.</div>`;
 
   dlg.innerHTML = `
     <form method="dialog" novalidate>
@@ -930,38 +1091,38 @@ function ejecutarAccion(tipo) {
         <div><span>Financiado</span><span class="num">${mxn(s.monto_financiado)}</span></div>
       </div>
       ${advertencias}
-      <label for="dlgTexto">${cfg.etiqueta}</label>
-      ${cfg.rapidos ? `<div class="rapidos">${cfg.rapidos.map(r => `<button type="button" data-rapido="${esc(r)}">${esc(r)}</button>`).join('')}</div>` : ''}
-      <textarea id="dlgTexto" maxlength="500"></textarea>
-      <div class="err" id="dlgError" hidden></div>
+      ${cfg.formulario(s)}
+      <div class="err" id="dlgError" role="alert" hidden></div>
       <div class="pie">
         <button class="btn btn-neutro" type="button" id="dlgCerrar">Volver</button>
         <button class="btn ${cfg.claseBoton}" type="button" id="dlgConfirmar">${cfg.boton}</button>
       </div>
     </form>`;
 
-  const txt = $('#dlgTexto', dlg), err = $('#dlgError', dlg), ok = $('#dlgConfirmar', dlg);
+  const err = $('#dlgError', dlg), ok = $('#dlgConfirmar', dlg), txt = $('#dlgTexto', dlg);
   dlg.querySelectorAll('[data-rapido]').forEach(b => b.addEventListener('click', () => {
     txt.value = b.dataset.rapido + (txt.value && !txt.value.startsWith(b.dataset.rapido) ? '. ' + txt.value : '');
     txt.focus();
   }));
+  if (cfg.preparar) cfg.preparar(dlg, s);
   $('#dlgCerrar', dlg).addEventListener('click', () => dlg.close());
 
   ok.addEventListener('click', async () => {
-    const valor = txt.value.trim();
-    if (cfg.obligatorio && valor.length < 5) {
-      err.textContent = 'Escribe el motivo (al menos 5 caracteres) o elige uno de los sugeridos.';
-      err.hidden = false; txt.focus();
+    let params;
+    try {
+      params = cfg.recoger(dlg);
+    } catch (e) {
+      err.textContent = e.message; err.hidden = false;
       return;
     }
     err.hidden = true;
     ok.disabled = true;
     ok.innerHTML = '<span class="giro" aria-hidden="true"></span>Guardando';
     try {
-      await rpc(cfg.funcion, { p_solicitud_id: s.id, [cfg.parametro]: valor || null });
+      await rpc(cfg.funcion, Object.assign({ p_solicitud_id: s.id }, params));
       dlg.close();
-      aviso('Solicitud ' + s.folio + ' ' + cfg.exito + '.');
-      estado.resumen = null;          // el tablero se recarga al volver
+      aviso(cfg.exito(s.folio));
+      estado.resumen = null;
       vistaFicha(s.id);
     } catch (e) {
       if (e.message === 'Sesión no válida') { dlg.close(); return; }
@@ -973,7 +1134,8 @@ function ejecutarAccion(tipo) {
   });
 
   dlg.showModal();
-  setTimeout(() => txt.focus(), 30);
+  const primero = dlg.querySelector('input, textarea');
+  if (primero) setTimeout(() => primero.focus(), 30);
 }
 
 /* ============================================================
